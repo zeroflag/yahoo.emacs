@@ -20,3 +20,8 @@
         :desc "Read the ticker from the current line, and insert the price"
         "y y" #'yf-read-ticker-and-insert-price))
 ```
+
+```lisp
+(yf-get "QQQ")
+(yf-get-price "QQQ")
+```
