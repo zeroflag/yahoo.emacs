@@ -51,7 +51,7 @@
   (car (yf-get ticker)))
 
 (defun yf-price-to-string (price)
-  (concat (number-to-string (car price)) " " (cdr price) "\n"))
+  (concat (number-to-string (car price)) " " (cdr price)))
 
 (defun yf-insert-stock-price (ticker)
   "Fetch stock price denoted by TICKER and insert it into the buffer."
