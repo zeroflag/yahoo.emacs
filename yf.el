@@ -34,7 +34,8 @@
         (cons (/ price 100) currency)
       (cons price currency))))
 
-(defun yf-fetch (ticker)
+(defun yf-get (ticker)
+  (interactive "sTicker: ")
   (let ((response (request (yf-api-url ticker)
                     :type "GET"
                     :sync t
@@ -49,7 +50,7 @@
 (defun yf-insert-stock-price (ticker)
   "Fetch stock price denoted by TICKER and insert it into the buffer."
   (interactive "sTicker: ")
-  (let ((result (yf-fetch (string-trim ticker))))
+  (let ((result (yf-get (string-trim ticker))))
     (move-end-of-line nil)
     (insert " ")
     (insert (yf-price-to-string result))))
