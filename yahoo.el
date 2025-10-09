@@ -51,10 +51,19 @@
 (defun yahoo-stock-price (ticker)
   "Fetch stock price denoted by TICKER and insert it into the buffer."
   (interactive "sTicker: ")
-  (yahoo-fetch ticker
+  (yahoo-fetch (string-trim ticker)
                (lambda (result)
                  (move-end-of-line nil)
+                 (insert " ")
                  (insert (yahoo-price-to-string result)))))
+
+(defun yahoo-read-ticker-and-get-price ()
+  "Get the ticker from the current line and call `yahoo-stock-price`."
+  (interactive)
+  (let ((line (thing-at-point 'line t)))
+    (yahoo-stock-price line)))
+
+;(global-set-key (kbd "<f12>") 'yahoo-read-ticker-and-get-price)
 
 ;;Local Variables:
 ;; byte-compile-warnings: (not docstrings)
