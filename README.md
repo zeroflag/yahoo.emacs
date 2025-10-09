@@ -21,6 +21,8 @@
         "y y" #'yf-read-ticker-and-insert-price))
 ```
 
+### Examples
+
 ```lisp
 (yf-get "QQQ")
 (yf-get-price "QQQ")
