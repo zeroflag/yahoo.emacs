@@ -35,6 +35,7 @@
       (cons price currency))))
 
 (defun yf-get (ticker)
+  "Fetch stock price and currency of the given TICKER"
   (interactive "sTicker: ")
   (let ((response (request (yf-api-url ticker)
                     :type "GET"
@@ -43,6 +44,11 @@
                                ("User-Agent" . yf-user-agent))
                     :parser 'json-read)))
     (yf-extract (request-response-data response))))
+
+(defun yf-get-price (ticker)
+  "Fetch stock price of the given TICKER"
+  (interactive "sTicker: ")
+  (car (yf-get ticker)))
 
 (defun yf-price-to-string (price)
   (concat (number-to-string (car price)) " " (cdr price) "\n"))
@@ -56,7 +62,7 @@
     (insert (yf-price-to-string result))))
 
 (defun yf-read-ticker-and-insert-price ()
-  "Get the ticker from the current line and call `yf-stock-price`."
+  "Read the ticker from the current line and insert its price"
   (interactive)
   (let ((line (thing-at-point 'line t)))
     (yf-insert-stock-price line)))
