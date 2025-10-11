@@ -216,7 +216,7 @@
          (result (yf-eval-postfix line)))
     (beginning-of-line)
     (kill-line)
-    (insert (concat line (number-to-string result)))))
+    (insert (concat line " => " (number-to-string result)))))
 
 (provide 'yf)
 
