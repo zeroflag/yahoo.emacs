@@ -63,6 +63,9 @@
         (cons (/ price 100) currency)
       (cons price currency))))
 
+(defun yf-http-success? (code)
+  (and (<= code 200) (>= code 200)))
+
 (defun yf-get (ticker)
   "Fetch stock price and currency of the given TICKER"
   (interactive "sTicker: ")
@@ -72,7 +75,8 @@
                     :headers '(("Accept" . "application/json")
                                ("User-Agent" . yf-user-agent))
                     :parser 'json-read)))
-    (yf-extract (request-response-data response))))
+    (when (yf-http-success? (request-response-status-code response))
+      (yf-extract (request-response-data response)))))
 
 ;; Ticker prices
 
