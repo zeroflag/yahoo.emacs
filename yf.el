@@ -206,16 +206,17 @@
   (interactive "sExpression: ")
   (let* ((line (yf-resolve-tickers line))
          (line (yf-resolve-xchg-rates line)))
-    (yf-eval-postfix line)))
+    line))
 
 (defun yf-resolve-in-line ()
   "Read and resolve both tickers and currency conversion expressions in current line."
   (interactive)
   (let* ((line (thing-at-point 'line t))
-         (line (yf-resolve line)))
+         (line (yf-resolve line))
+         (result (yf-eval-postfix line)))
     (beginning-of-line)
     (kill-line)
-    (insert line)))
+    (insert (concat line (number-to-string result)))))
 
 (provide 'yf)
 
