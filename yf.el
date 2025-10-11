@@ -100,32 +100,66 @@
         (setq line (string-replace expression result line))))
     line))
 
+(defconst yf-currency-codes
+  '("AED" "AFN" "ALL" "AMD" "ANG" "AOA" "ARS" "AUD" "AWG" "AZN"
+    "BAM" "BBD" "BDT" "BGN" "BHD" "BIF" "BMD" "BND" "BOB" "BRL"
+    "BSD" "BTN" "BWP" "BYN" "BZD" "CAD" "CDF" "CHF" "CLP" "CNY"
+    "COP" "CRC" "CUP" "CVE" "CZK" "DJF" "DKK" "DOP" "DZD" "EGP"
+    "ERN" "ETB" "EUR" "FJD" "FKP" "FOK" "GBP" "GEL" "GGP" "GHS"
+    "GIP" "GMD" "GNF" "GTQ" "GYD" "HKD" "HNL" "HRK" "HTG" "HUF"
+    "IDR" "ILS" "IMP" "INR" "IQD" "IRR" "ISK" "JEP" "JMD" "JOD"
+    "JPY" "KES" "KGS" "KHR" "KID" "KMF" "KRW" "KWD" "KYD" "KZT"
+    "LAK" "LBP" "LKR" "LRD" "LSL" "LYD" "MAD" "MDL" "MGA" "MKD"
+    "MMK" "MNT" "MOP" "MRU" "MUR" "MVR" "MWK" "MXN" "MYR" "MZN"
+    "NAD" "NGN" "NIO" "NOK" "NPR" "NZD" "OMR" "PAB" "PEN" "PGK"
+    "PHP" "PKR" "PLN" "PYG" "QAR" "RON" "RSD" "RUB" "RWF" "SAR"
+    "SBD" "SCR" "SDG" "SEK" "SGD" "SHP" "SLE" "SOS" "SRD" "SSP"
+    "STN" "SYP" "SZL" "THB" "TJS" "TMT" "TND" "TOP" "TRY" "TTD"
+    "TVD" "TWD" "TZS" "UAH" "UGX" "USD" "UYU" "UZS" "VES" "VND"
+    "VUV" "WST" "XAF" "XCD" "XDR" "XOF" "XPF" "YER" "ZAR" "ZMW"
+    "ZWL"))
+
+(defconst yf-currency-set (make-hash-table :test 'equal))
+
+(dolist (code yf-currency-codes)
+  (puthash code t yf-currency-set))
+
+(defun yf-is-currency? (token)
+  (gethash token yf-currency-set))
+
+(defun yf-add (a b) (+ a b))
+(defun yf-sub (a b) (- a b))
+(defun yf-mul (a b) (* a b))
+(defun yf-div (a b) (/ a b))
+
 (defun yf-eval-postfix (line)
   "Evaluate LINE containing postfix expression."
   (let* ((stack '())
          (dict (make-hash-table :test #'equal))
          (tokens (split-string line)))
-    (puthash "+" (lambda () (push (+ (pop stack) (pop stack)) stack)) dict)
-    (puthash "*" (lambda () (push (* (pop stack) (pop stack)) stack)) dict)
+    (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
+    (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
     (puthash "." (lambda () (message "%s" (pop stack))) dict)
     (puthash "-" (lambda ()
                    (let ((b (pop stack))
                          (a (pop stack)))
-                     (push (- a b) stack))) dict)
+                     (push (yf-sub a b) stack))) dict)
     (puthash "/" (lambda ()
                    (let ((b (pop stack))
                          (a (pop stack)))
-                     (push (/ a b) stack))) dict)
-    (dolist (each tokens)
-      (if (gethash each dict)
-          (funcall (gethash each dict))
-        (push (string-to-number each) stack)))
+                     (push (yf-div a b) stack))) dict)
+    (dolist (tok tokens)
+      (cond
+       ((gethash tok dict)
+        (funcall (gethash tok dict)))
+       ((yf-is-currency? tok)
+        (push (cons (pop stack) tok) stack))
+       (t
+        (push (string-to-number tok) stack))))
     (cond
-     ((= (length stack) 1)
-      (pop stack))
-     ((= (length stack) 0)
-      nil)
-     (t (user-error (format "Expected a single result, got: %s" stack))))))
+     ((= (length stack) 1) (pop stack))
+     ((= (length stack) 0) nil)
+     (t (user-error (format "Expected 1 result, got %s" stack))))))
 
 (defun yf-resolve (line)
   "Read and resolve both tickers and currency conversion expression in LINE.
