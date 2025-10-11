@@ -80,6 +80,25 @@
   (let ((rate (yf-xchg-rate src-currency dst-currency)))
     (* rate amount)))
 
+(defun yf-convert-expression (expression)
+  "Convert from currency1 to currency to represented by EXPRESSION.
+
+   For example '10 usd to eur'."
+  (interactive "sExpression (e.g.: 10 usd to eur): ")
+  (let ((regexp ".*?\\([[:digit:].]+\\) \\([[:word:]]+\\) TO \\([[:word:]]+\\)"))
+    (when (string-match regexp expression)
+      (let* ((amount (string-to-number (match-string 1 expression)))
+             (src-currency (match-string 2 expression))
+             (dst-currency (match-string 3 expression)))
+        (yf-convert amount src-currency dst-currency)))))
+
+(defun yf-convert-line-and-insert-result ()
+  (let* ((line (thing-at-point 'line t))
+         (result (yf-convert-expression line)))
+    (move-end-of-line nil)
+    (insert " ")
+    (insert result)))
+
 (provide 'yf)
 
 ;;Local Variables:
