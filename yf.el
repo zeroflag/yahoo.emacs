@@ -195,6 +195,7 @@
                         (push a stack)
                         (push b stack))) dict)
     (puthash "dup" (lambda () (push (car stack) stack)) dict)
+    (puthash "over" (lambda () (push (cadr stack) stack)) dict)
     (puthash "drop" (lambda () (pop stack)) dict)
     (puthash "to" (lambda ()
                     (let ((currency (car tokens)))
