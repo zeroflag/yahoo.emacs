@@ -100,6 +100,8 @@
         (setq line (string-replace expression result line))))
     line))
 
+(defconst yf-default-currency "ANY")
+
 (defconst yf-currency-codes
   '("AED" "AFN" "ALL" "AMD" "ANG" "AOA" "ARS" "AUD" "AWG" "AZN"
     "BAM" "BBD" "BDT" "BGN" "BHD" "BIF" "BMD" "BND" "BOB" "BRL"
@@ -117,9 +119,8 @@
     "STN" "SYP" "SZL" "THB" "TJS" "TMT" "TND" "TOP" "TRY" "TTD"
     "TVD" "TWD" "TZS" "UAH" "UGX" "USD" "UYU" "UZS" "VES" "VND"
     "VUV" "WST" "XAF" "XCD" "XDR" "XOF" "XPF" "YER" "ZAR" "ZMW"
-    "ZWL"))
+    "ZWL" yf-default-currency))
 
-(defconst yf-default-currency "ANY")
 (defconst yf-currency-set (make-hash-table :test 'equal))
 
 (dolist (code yf-currency-codes)
