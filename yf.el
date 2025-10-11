@@ -125,7 +125,7 @@
 (defun yf-check-currency (c1 c2)
   (when (not (or (yf-is-default-currency? c1)
                  (yf-is-default-currency? c2)
-                 (string= c1 c2)))
+                 (string= (upcase c1) (upcase c2))))
     (user-error "Currency mismatch %s - %s" c1 c2)))
 
 (defun yf-add (a b)
