@@ -97,7 +97,7 @@
 
 (defun yf-resolve-tickers (line)
   "Read the tickers (e.g.: $SPY) from the LINE and replace them with their price."
-  (let ((regexp "\\$\\([[:word:]]+\\)"))
+  (let ((regexp "\\$\\([[:word:].]+\\)"))
     (while (string-match regexp line)
       (let* ((ticker (match-string 1 line))
              (price (yf-price-to-string (yf-get ticker))))
