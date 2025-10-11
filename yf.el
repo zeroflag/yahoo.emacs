@@ -101,7 +101,7 @@
          (result (yf-convert-expression line)))
     (move-end-of-line nil)
     (insert " ")
-    (insert result)))
+    (insert (number-to-string result))))
 
 (provide 'yf)
 
