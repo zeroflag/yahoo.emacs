@@ -13,12 +13,15 @@
 
 ```lisp
 (use-package! yf
-  :commands yf-read-ticker-and-insert-price
   :defer t
+  :commands (yf-read-ticker-and-insert-price yf-convert-line-and-insert-result)
   :init
   (map! :leader
         :desc "Read the ticker from the current line, and insert the price"
-        "y y" #'yf-read-ticker-and-insert-price))
+        "y y" #'yf-read-ticker-and-insert-price)
+  (map! :leader
+        :desc "Read the ticker from the current line, and insert the price"
+        "y c" #'yf-convert-line-and-insert-result))
 ```
 
 ### Examples
@@ -26,4 +29,5 @@
 ```lisp
 (yf-get "QQQ")
 (yf-get-price "QQQ")
+(yf-convert 100 "USD" "EUR")
 ```
