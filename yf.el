@@ -103,7 +103,7 @@
 (defconst yf-default-currency "ANY")
 
 (defconst yf-currency-codes
-  '("AED" "AFN" "ALL" "AMD" "ANG" "AOA" "ARS" "AUD" "AWG" "AZN"
+  `("AED" "AFN" "ALL" "AMD" "ANG" "AOA" "ARS" "AUD" "AWG" "AZN"
     "BAM" "BBD" "BDT" "BGN" "BHD" "BIF" "BMD" "BND" "BOB" "BRL"
     "BSD" "BTN" "BWP" "BYN" "BZD" "CAD" "CDF" "CHF" "CLP" "CNY"
     "COP" "CRC" "CUP" "CVE" "CZK" "DJF" "DKK" "DOP" "DZD" "EGP"
@@ -119,7 +119,7 @@
     "STN" "SYP" "SZL" "THB" "TJS" "TMT" "TND" "TOP" "TRY" "TTD"
     "TVD" "TWD" "TZS" "UAH" "UGX" "USD" "UYU" "UZS" "VES" "VND"
     "VUV" "WST" "XAF" "XCD" "XDR" "XOF" "XPF" "YER" "ZAR" "ZMW"
-    "ZWL" yf-default-currency))
+    "ZWL" ,yf-default-currency))
 
 (defconst yf-currency-set (make-hash-table :test 'equal))
 
@@ -167,6 +167,11 @@
     (yf-check-currency c1 c2)
     (cons (/ (float n1) n2) c1)))
 
+(defun yf-tonum (str)
+  (if (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str)
+      (string-to-number str)
+    (user-error "Not a number: %s" str)))
+
 (defun yf-eval-postfix (line)
   "Evaluate LINE containing postfix expression."
   (let* ((stack '())
@@ -190,7 +195,7 @@
        ((yf-is-currency? tok)
         (push (cons (car (pop stack)) tok) stack)) ; ( num . currency )
        (t
-        (push (cons (string-to-number tok)
+        (push (cons (yf-tonum tok)
                     yf-default-currency) stack)))) ; ( num . nil )
     stack))
 
