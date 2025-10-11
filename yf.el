@@ -119,7 +119,7 @@
     "VUV" "WST" "XAF" "XCD" "XDR" "XOF" "XPF" "YER" "ZAR" "ZMW"
     "ZWL"))
 
-(defconst yf-default-currency "N/A")
+(defconst yf-default-currency "ANY")
 (defconst yf-currency-set (make-hash-table :test 'equal))
 
 (dolist (code yf-currency-codes)
@@ -140,7 +140,7 @@
         (c1 (cdr a))
         (c2 (cdr b)))
     (yf-check-currency c1 c2)
-    (+ n1 n2)))
+    (cons (+ n1 n2) c1)))
 
 (defun yf-sub (a b)
   (let ((n1 (car a))
@@ -148,7 +148,7 @@
         (c1 (cdr a))
         (c2 (cdr b)))
     (yf-check-currency c1 c2)
-    (- n1 n2)))
+    (cons (- n1 n2) c1)))
 
 (defun yf-mul (a b)
   (let ((n1 (car a))
@@ -156,7 +156,7 @@
         (c1 (cdr a))
         (c2 (cdr b)))
     (yf-check-currency c1 c2)
-    (* n1 n2)))
+    (cons (* n1 n2) c1)))
 
 (defun yf-div (a b)
   (let ((n1 (car a))
@@ -164,7 +164,7 @@
         (c1 (cdr a))
         (c2 (cdr b)))
     (yf-check-currency c1 c2)
-    (/ (float n1) n2)))
+    (cons (/ (float n1) n2) c1)))
 
 (defun yf-eval-postfix (line)
   "Evaluate LINE containing postfix expression."
@@ -191,10 +191,7 @@
        (t
         (push (cons (string-to-number tok)
                     yf-default-currency) stack)))) ; ( num . nil )
-    (cond
-     ((= (length stack) 1) (pop stack))
-     ((= (length stack) 0) nil)
-     (t (user-error (format "Expected 1 result, got %s" stack))))))
+    stack))
 
 (defun yf-resolve (line)
   "Read and resolve both tickers and currency conversion expression in LINE.
@@ -213,10 +210,13 @@
   (interactive)
   (let* ((line (thing-at-point 'line t))
          (line (yf-resolve line))
-         (result (yf-eval-postfix line)))
+         (result (yf-eval-postfix line))
+         (result (if (= 1 (length result))
+                     (pop result)
+                   result)))
     (beginning-of-line)
     (kill-line)
-    (insert (concat line " => " (number-to-string result)))))
+    (insert (concat line (format " => %s" result)))))
 
 (provide 'yf)
 
