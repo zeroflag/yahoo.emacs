@@ -65,7 +65,6 @@
 
 (defun yf-resolve-tickers (line)
   "Read the tickers (e.g.: $SPY) from the LINE and replace them with their price."
-  (interactive)
   (let ((regexp "\\$\\([[:word:]]+\\)"))
     (while (string-match regexp line)
       (let* ((ticker (match-string 1 line))
@@ -90,7 +89,6 @@
 
 (defun yf-resolve-xchg-rates (line)
   "Read and resolve currency expression (e.g.: 10 usd to huf) from the current line."
-  (interactive)
   (let ((regexp "\\([[:digit:].]+\\) \\([[:word:]]+\\) TO \\([[:word:]]+\\)"))
     (while (string-match regexp line)
       (let* ((expression (match-string 0 line))
@@ -108,7 +106,7 @@
     $BLK $O
     100 usd to eur
     $SPY to eur"
-  (interactive)
+  (interactive "sExpression: ")
   (let* ((line (yf-resolve-tickers line))
          (line (yf-resolve-xchg-rates line)))
     line))

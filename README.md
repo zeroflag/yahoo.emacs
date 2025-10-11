@@ -14,7 +14,7 @@
 ```lisp
 (use-package! yf
   :defer t
-  :commands (yf-resolve)
+  :commands (yf-resolve-in-line)
   :init
   (map! :leader
         :desc "Resolve tickers and currencies in the current line"
