@@ -119,18 +119,52 @@
     "VUV" "WST" "XAF" "XCD" "XDR" "XOF" "XPF" "YER" "ZAR" "ZMW"
     "ZWL"))
 
+(defconst yf-default-currency "N/A")
 (defconst yf-currency-set (make-hash-table :test 'equal))
 
 (dolist (code yf-currency-codes)
   (puthash code t yf-currency-set))
 
 (defun yf-is-currency? (token)
-  (gethash token yf-currency-set))
+  (gethash (upcase token) yf-currency-set))
 
-(defun yf-add (a b) (+ a b))
-(defun yf-sub (a b) (- a b))
-(defun yf-mul (a b) (* a b))
-(defun yf-div (a b) (/ a b))
+(defun yf-check-currency (c1 c2)
+  (when (not (or (string= c1 yf-default-currency)
+                 (string= c2 yf-default-currency)
+                 (string= c1 c2)))
+    (user-error "Currency mismatch %s - %s" c1 c2)))
+
+(defun yf-add (a b)
+  (let ((n1 (car a))
+        (n2 (car b))
+        (c1 (cdr a))
+        (c2 (cdr b)))
+    (yf-check-currency c1 c2)
+    (+ n1 n2)))
+
+(defun yf-sub (a b)
+  (let ((n1 (car a))
+        (n2 (car b))
+        (c1 (cdr a))
+        (c2 (cdr b)))
+    (yf-check-currency c1 c2)
+    (- n1 n2)))
+
+(defun yf-mul (a b)
+  (let ((n1 (car a))
+        (n2 (car b))
+        (c1 (cdr a))
+        (c2 (cdr b)))
+    (yf-check-currency c1 c2)
+    (* n1 n2)))
+
+(defun yf-div (a b)
+  (let ((n1 (car a))
+        (n2 (car b))
+        (c1 (cdr a))
+        (c2 (cdr b)))
+    (yf-check-currency c1 c2)
+    (/ (float n1) n2)))
 
 (defun yf-eval-postfix (line)
   "Evaluate LINE containing postfix expression."
@@ -153,9 +187,10 @@
        ((gethash tok dict)
         (funcall (gethash tok dict)))
        ((yf-is-currency? tok)
-        (push (cons (pop stack) tok) stack))
+        (push (cons (car (pop stack)) tok) stack)) ; ( num . currency )
        (t
-        (push (string-to-number tok) stack))))
+        (push (cons (string-to-number tok)
+                    yf-default-currency) stack)))) ; ( num . nil )
     (cond
      ((= (length stack) 1) (pop stack))
      ((= (length stack) 0) nil)
@@ -171,7 +206,7 @@
   (interactive "sExpression: ")
   (let* ((line (yf-resolve-tickers line))
          (line (yf-resolve-xchg-rates line)))
-    line))
+    (yf-eval-postfix line)))
 
 (defun yf-resolve-in-line ()
   "Read and resolve both tickers and currency conversion expressions in current line."
