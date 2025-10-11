@@ -20,7 +20,7 @@
         :desc "Read the ticker from the current line, and insert the price"
         "y y" #'yf-read-ticker-and-insert-price)
   (map! :leader
-        :desc "Read the ticker from the current line, and insert the price"
+        :desc "Parse a currency conversion expression (e.g.: 1 usd to huf) from the current line."
         "y c" #'yf-convert-line-and-insert-result))
 ```
 
