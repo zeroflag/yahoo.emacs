@@ -85,7 +85,7 @@
   (let ((rate (yf-xchg-rate src-currency dst-currency)))
     (* rate amount)))
 
-;; Line parsing
+;; Expression evaluator
 
 (defun yf-resolve-xchg-rates (line)
   "Read and resolve currency expression (e.g.: 10 usd to huf) from the current line."
@@ -95,8 +95,9 @@
              (amount (string-to-number (match-string 1 line)))
              (src-currency (match-string 2 line))
              (dst-currency (match-string 3 line))
-             (result (yf-convert amount src-currency dst-currency)))
-        (setq line (string-replace expression (number-to-string result) line))))
+             (new-amount (yf-convert amount src-currency dst-currency))
+             (result (concat (number-to-string new-amount) " " (upcase dst-currency))))
+        (setq line (string-replace expression result line))))
     line))
 
 (defun yf-resolve (line)
