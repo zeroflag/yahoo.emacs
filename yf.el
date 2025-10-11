@@ -209,14 +209,12 @@
   "Read and resolve both tickers and currency conversion expressions in current line."
   (interactive)
   (let* ((line (thing-at-point 'line t))
-         (line (yf-resolve line))
-         (result (yf-eval-postfix line))
-         (result (if (= 1 (length result))
-                     (pop result)
-                   result)))
+         (resolved (yf-resolve line))
+         (result (yf-eval-postfix resolved))
+         (result (mapconcat #'yf-price-to-string result " ")))
     (beginning-of-line)
     (kill-line)
-    (insert (concat line (format " => %s" result)))))
+    (insert result)))
 
 (provide 'yf)
 
