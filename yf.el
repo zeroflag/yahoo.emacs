@@ -45,6 +45,8 @@
                     :parser 'json-read)))
     (yf-extract (request-response-data response))))
 
+;; Ticker prices
+
 (defun yf-get-price (ticker)
   "Fetch stock price of the given TICKER"
   (interactive "sTicker: ")
@@ -61,11 +63,15 @@
     (insert " ")
     (insert (yf-price-to-string result))))
 
-(defun yf-read-ticker-and-insert-price ()
-  "Read the ticker from the current line and insert its price"
+(defun yf-resolve-tickers (line)
+  "Read the tickers (e.g.: $SPY) from the LINE and replace them with their price."
   (interactive)
-  (let ((line (thing-at-point 'line t)))
-    (yf-insert-stock-price line)))
+  (let ((regexp "\\$\\([[:word:]]+\\)"))
+    (while (string-match regexp line)
+      (let* ((ticker (match-string 1 line))
+             (price (yf-price-to-string (yf-get ticker))))
+        (setq line (string-replace (concat "$" ticker) price line))))
+    line))
 
 ;; Exchange rates
 
@@ -80,28 +86,41 @@
   (let ((rate (yf-xchg-rate src-currency dst-currency)))
     (* rate amount)))
 
-(defun yf-convert-expression (expression)
-  "Convert from currency1 to currency to represented by EXPRESSION.
+;; Line parsing
 
-   For example '10 usd to eur'."
-  (interactive "sExpression (e.g.: 10 usd to eur): ")
-  (let ((regexp ".*?\\([[:digit:].]+\\) \\([[:word:]]+\\) TO \\([[:word:]]+\\)"))
-    (when (string-match regexp expression)
-      (let* ((amount (string-to-number (match-string 1 expression)))
-             (src-currency (match-string 2 expression))
-             (dst-currency (match-string 3 expression)))
-        (yf-convert amount src-currency dst-currency)))))
+(defun yf-resolve-xchg-rates (line)
+  "Read and resolve currency expression (e.g.: 10 usd to huf) from the current line."
+  (interactive)
+  (let ((regexp "\\([[:digit:].]+\\) \\([[:word:]]+\\) TO \\([[:word:]]+\\)"))
+    (while (string-match regexp line)
+      (let* ((expression (match-string 0 line))
+             (amount (string-to-number (match-string 1 line)))
+             (src-currency (match-string 2 line))
+             (dst-currency (match-string 3 line))
+             (result (yf-convert amount src-currency dst-currency)))
+        (setq line (string-replace expression (number-to-string result) line))))
+    line))
 
-(defun yf-convert-line-and-insert-result ()
-  "Parse the current line representing a currency conversion expression.
+(defun yf-resolve (line)
+  "Read and resolve both tickers and currency conversion expression in LINE.
 
-   For example: 10 usd to huf"
+  E.g.:
+    $BLK $O
+    100 usd to eur
+    $SPY to eur"
+  (interactive)
+  (let* ((line (yf-resolve-tickers line))
+         (line (yf-resolve-xchg-rates line)))
+    line))
+
+(defun yf-resolve-in-line ()
+  "Read and resolve both tickers and currency conversion expressions in current line."
   (interactive)
   (let* ((line (thing-at-point 'line t))
-         (result (yf-convert-expression line)))
-    (move-end-of-line nil)
-    (insert " ")
-    (insert (number-to-string result))))
+         (line (yf-resolve line)))
+    (beginning-of-line)
+    (kill-line)
+    (insert line)))
 
 (provide 'yf)
 

@@ -14,14 +14,11 @@
 ```lisp
 (use-package! yf
   :defer t
-  :commands (yf-read-ticker-and-insert-price yf-convert-line-and-insert-result)
+  :commands (yf-resolve)
   :init
   (map! :leader
-        :desc "Read the ticker from the current line, and insert the price"
-        "y y" #'yf-read-ticker-and-insert-price)
-  (map! :leader
-        :desc "Parse a currency conversion expression (e.g.: 1 usd to huf) from the current line."
-        "y c" #'yf-convert-line-and-insert-result))
+        :desc "Resolve tickers and currencies in the current line"
+        "y r" #'yf-resolve-in-line))
 ```
 
 ### Examples
