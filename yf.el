@@ -116,19 +116,6 @@
 
 ;; Expression evaluator
 
-(defun yf-resolve-xchg-rates (line)
-  "Read and resolve currency expression (e.g.: 10 usd to huf) from the current line."
-  (let ((regexp "\\([[:digit:].]+\\) \\([[:word:]]+\\) TO \\([[:word:]]+\\)"))
-    (while (string-match regexp line)
-      (let* ((expression (match-string 0 line))
-             (amount (string-to-number (match-string 1 line)))
-             (src-currency (match-string 2 line))
-             (dst-currency (match-string 3 line))
-             (new-amount (yf-convert amount src-currency dst-currency))
-             (result (concat (number-to-string new-amount) " " (upcase dst-currency))))
-        (setq line (string-replace expression result line))))
-    line))
-
 (defun yf-is-currency? (token)
   (gethash (upcase token) yf-currency-set))
 
@@ -175,6 +162,13 @@
       (string-to-number str)
     (user-error "Not a number: %s" str)))
 
+(defun yf-to (num-with-currency dst-currency)
+  ; TODO check for any
+  (let* ((amount (car num-with-currency))
+         (src-currency (cdr num-with-currency))
+         (result (yf-convert amount src-currency dst-currency)))
+    (cons result dst-currency)))
+
 (defun yf-eval-postfix (line)
   "Evaluate LINE containing postfix expression."
   (let* ((stack '())
@@ -191,34 +185,28 @@
                    (let ((b (pop stack))
                          (a (pop stack)))
                      (push (yf-div a b) stack))) dict)
-    (dolist (tok tokens)
-      (cond
-       ((gethash tok dict)
-        (funcall (gethash tok dict)))
-       ((yf-is-currency? tok)
-        (push (cons (car (pop stack)) tok) stack)) ; ( num . currency )
-       (t
-        (push (cons (yf-tonum tok)
-                    yf-default-currency) stack)))) ; ( num . nil )
+    (puthash "to" (lambda ()
+                    (let ((currency (car tokens)))
+                      (push (yf-to (pop stack) currency) stack))
+                    (setq tokens (cdr tokens))) dict)
+    (while tokens
+      (let ((tok (car tokens)))
+        (setq tokens (cdr tokens))
+        (cond
+         ((gethash tok dict)
+          (funcall (gethash tok dict)))
+         ((yf-is-currency? tok)
+          (push (cons (car (pop stack)) tok) stack))
+         (t
+          (push (cons (yf-tonum tok)
+                      yf-default-currency) stack)))))
     stack))
-
-(defun yf-resolve (line)
-  "Read and resolve both tickers and currency conversion expression in LINE.
-
-  E.g.:
-    $BLK $O
-    100 usd to eur
-    $SPY to eur"
-  (interactive "sExpression: ")
-  (let* ((line (yf-resolve-tickers line))
-         (line (yf-resolve-xchg-rates line)))
-    line))
 
 (defun yf-resolve-in-line ()
   "Read and resolve both tickers and currency conversion expressions in current line."
   (interactive)
   (let* ((line (thing-at-point 'line t))
-         (resolved (yf-resolve line))
+         (resolved (yf-resolve-tickers line))
          (result (yf-eval-postfix resolved))
          (result (mapconcat #'yf-price-to-string result " ")))
     (beginning-of-line)
