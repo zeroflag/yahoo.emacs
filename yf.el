@@ -87,14 +87,6 @@
               ""
             (cdr price))))
 
-(defun yf-insert-stock-price (ticker)
-  "Fetch stock price denoted by TICKER and insert it into the buffer."
-  (interactive "sTicker: ")
-  (let ((result (yf-get (string-trim ticker))))
-    (move-end-of-line nil)
-    (insert " ")
-    (insert (yf-price-to-string result))))
-
 (defun yf-resolve-tickers (line)
   "Read the tickers (e.g.: $SPY) from the LINE and replace them with their price."
   (let ((regexp "\\$\\([[:word:].]+\\)"))
