@@ -49,6 +49,9 @@
 (dolist (code yf-currency-codes)
   (puthash code t yf-currency-set))
 
+(defun yf-is-default-currency? (s)
+  (string= (upcase s) (upcase yf-default-currency)))
+
 (defun yf-extract (json)
   (let* ((chart    (assoc-default 'chart json))
          (result   (assoc-default 'result chart))
@@ -80,7 +83,7 @@
 
 (defun yf-price-to-string (price)
   (concat (number-to-string (car price)) " "
-          (if (string= yf-default-currency (cdr price))
+          (if (yf-is-default-currency? (cdr price))
               ""
             (cdr price))))
 
@@ -120,8 +123,8 @@
   (gethash (upcase token) yf-currency-set))
 
 (defun yf-check-currency (c1 c2)
-  (when (not (or (string= c1 yf-default-currency)
-                 (string= c2 yf-default-currency)
+  (when (not (or (yf-is-default-currency? c1)
+                 (yf-is-default-currency? c2)
                  (string= c1 c2)))
     (user-error "Currency mismatch %s - %s" c1 c2)))
 
@@ -163,11 +166,20 @@
     (user-error "Not a number: %s" str)))
 
 (defun yf-to (num-with-currency dst-currency)
-  ; TODO check for any
+  (when (not (yf-is-currency? dst-currency))
+    (user-error "Not a valid currency %s" dst-currency))
   (let* ((amount (car num-with-currency))
-         (src-currency (cdr num-with-currency))
-         (result (yf-convert amount src-currency dst-currency)))
-    (cons result dst-currency)))
+         (src-currency (cdr num-with-currency)))
+    (when (not (yf-is-currency? src-currency))
+      (user-error "Not a valid currency %s" src-currency))
+    (cond
+     ((yf-is-default-currency? src-currency)
+      (cons amount dst-currency))
+     ((yf-is-default-currency? dst-currency)
+      (cons amount src-currency))
+     (t
+      (cons (yf-convert amount src-currency dst-currency)
+            dst-currency)))))
 
 (defun yf-eval-postfix (line)
   "Evaluate LINE containing postfix expression."
