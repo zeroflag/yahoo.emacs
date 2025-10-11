@@ -67,6 +67,19 @@
   (let ((line (thing-at-point 'line t)))
     (yf-insert-stock-price line)))
 
+;; Exchange rates
+
+(defun yf-xchg-rate (src-currency dst-currency)
+  (let* ((ticker (concat src-currency dst-currency "=X"))
+         (rate (yf-get ticker)))
+    (car rate)))
+
+(defun yf-convert (amount src-currency dst-currency)
+  "Convert AMOUNT from SRC-CURRENCY to DST-CURRENCY."
+  (interactive)
+  (let ((rate (yf-xchg-rate src-currency dst-currency)))
+    (* rate amount)))
+
 (provide 'yf)
 
 ;;Local Variables:
