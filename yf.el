@@ -100,6 +100,33 @@
         (setq line (string-replace expression result line))))
     line))
 
+(defun yf-eval-postfix (line)
+  "Evaluate LINE containing postfix expression."
+  (let* ((stack '())
+         (dict (make-hash-table :test #'equal))
+         (tokens (split-string line)))
+    (puthash "+" (lambda () (push (+ (pop stack) (pop stack)) stack)) dict)
+    (puthash "*" (lambda () (push (* (pop stack) (pop stack)) stack)) dict)
+    (puthash "." (lambda () (message "%s" (pop stack))) dict)
+    (puthash "-" (lambda ()
+                   (let ((b (pop stack))
+                         (a (pop stack)))
+                     (push (- a b) stack))) dict)
+    (puthash "/" (lambda ()
+                   (let ((b (pop stack))
+                         (a (pop stack)))
+                     (push (/ a b) stack))) dict)
+    (dolist (each tokens)
+      (if (gethash each dict)
+          (funcall (gethash each dict))
+        (push (string-to-number each) stack)))
+    (cond
+     ((= (length stack) 1)
+      (pop stack))
+     ((= (length stack) 0)
+      nil)
+     (t (user-error (format "Expected a single result, got: %s" stack))))))
+
 (defun yf-resolve (line)
   "Read and resolve both tickers and currency conversion expression in LINE.
 
