@@ -93,6 +93,10 @@
         (yf-convert amount src-currency dst-currency)))))
 
 (defun yf-convert-line-and-insert-result ()
+  "Parse the current line representing a currency conversion expression.
+
+   For example: 10 usd to huf"
+  (interactive)
   (let* ((line (thing-at-point 'line t))
          (result (yf-convert-expression line)))
     (move-end-of-line nil)
