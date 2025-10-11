@@ -64,7 +64,7 @@
       (cons price currency))))
 
 (defun yf-http-success? (code)
-  (and (<= code 200) (>= code 200)))
+  (and (<= code 299) (>= code 200)))
 
 (defun yf-get (ticker)
   "Fetch stock price and currency of the given TICKER"
