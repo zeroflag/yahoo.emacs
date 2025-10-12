@@ -87,7 +87,7 @@
   (car (yf-get ticker)))
 
 (defun yf-price-to-string (price)
-  (concat (number-to-string (car price)) " "
+  (concat (format "%.2f" (car price)) " "
           (if (yf-is-default-currency? (cdr price))
               ""
             (cdr price))))
