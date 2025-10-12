@@ -227,21 +227,23 @@
                       yf-default-currency) stack)))))
     stack))
 
+(defun yf-show-stack (stack)
+  (mapconcat #'yf-price-to-string stack " "))
+
 (defun yf-eval (line &optional stack)
   "Read and resolve both tickers and currency conversion expressions from LINE."
   (interactive)
-  (let* ((resolved (yf-resolve-tickers line))
-         (result (yf-eval-postfix resolved stack)))
-    (mapconcat #'yf-price-to-string result " ")))
+  (let* ((resolved (yf-resolve-tickers line)))
+    (yf-eval-postfix resolved stack)))
 
 (defun yf-eval-current-line ()
   "Read and resolve both tickers and currency conversion expressions in current line."
   (interactive)
   (let* ((line (thing-at-point 'line t))
-         (result (yf-eval line)))
+         (stack (yf-eval line)))
     (beginning-of-line)
     (kill-line)
-    (insert result)))
+    (insert (yf-show-stack stack))))
 
 (defvar yf-repl-stack '())
 (defconst yf-repl-buffer-name "*Yahoo Finance REPL*")
@@ -262,11 +264,11 @@
          (input (if (string-prefix-p yf-repl-prompt input)
                     (substring input (length yf-repl-prompt))
                   input))
-         (input (string-trim input))
-         (result (yf-eval input yf-repl-stack)))
-    (goto-char (point-max))
-    (insert "\n" result "\n\n")
-    (yf-insert-prompt)))
+         (input (string-trim input)))
+    (setq yf-repl-stack (yf-eval input yf-repl-stack)))
+  (goto-char (point-max))
+  (insert "\n" (yf-show-stack yf-repl-stack) "\n\n")
+  (yf-insert-prompt))
 
 (defvar yf-repl-mode-map
   (let ((map (make-sparse-keymap)))
