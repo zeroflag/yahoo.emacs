@@ -179,10 +179,9 @@
       (cons (yf-convert amount src-currency dst-currency)
             dst-currency)))))
 
-(defun yf-eval-postfix (line &optional initial-stack)
+(defun yf-eval-postfix (line &optional stack)
   "Evaluate LINE containing postfix expression."
-  (let* ((stack (or initial-stack '()))
-         (dict (make-hash-table :test #'equal))
+  (let* ((dict (make-hash-table :test #'equal))
          (tokens (split-string line)))
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
     (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
@@ -244,9 +243,9 @@
     (kill-line)
     (insert result)))
 
-(defvar yf-repl-buffer-name "*Yahoo Finance REPL*")
 (defvar yf-repl-stack '())
-(defvar yf-repl-prompt "yf>")
+(defconst yf-repl-buffer-name "*Yahoo Finance REPL*")
+(defconst yf-repl-prompt "(yf) $")
 
 (defun yf-insert-prompt ()
   (insert yf-repl-prompt)
@@ -284,6 +283,7 @@
   "Start the Yahoo Finance REPL."
   (interactive)
   (setq yf-repl-stack '())
+  (message "Starting Yahoo Finace REPL..")
   (let ((buf (get-buffer-create yf-repl-buffer-name)))
     (with-current-buffer buf
       (unless (derived-mode-p 'yf-repl-mode)
