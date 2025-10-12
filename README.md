@@ -1,5 +1,7 @@
 # Yahoo Stock Price Package for Emacs
 
+![{master}](https://github.com/zeroflag/yahoo.emacs/actions/workflows/ci.yml/badge.svg)
+
 ## Doom Emacs Config
 
 ### packages.el
