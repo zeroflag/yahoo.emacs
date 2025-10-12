@@ -23,6 +23,13 @@
   (should (equal (yf-eval-postfix "2 3 +")
              '((5 . "ANY")))))
 
+(ert-deftest yf-sum-test ()
+  (should (equal (yf-eval-postfix "sum") '()))
+  (should (equal (yf-eval-postfix "10 sum")
+             '((10 . "ANY"))))
+  (should (equal (yf-eval-postfix "2 3 4 5 sum")
+             '((14 . "ANY")))))
+
 (ert-deftest yf-stack-test ()
   (should (equal (yf-eval-postfix "4 dup")
              '((4 . "ANY") (4 . "ANY"))))
