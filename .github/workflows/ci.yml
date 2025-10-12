@@ -17,5 +17,5 @@ jobs:
       - uses: leotaku/elisp-check@master
         with:
          check: ert
-         file: test/
+         file: test/yf-test.el
 
