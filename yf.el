@@ -178,9 +178,9 @@
       (cons (yf-convert amount src-currency dst-currency)
             dst-currency)))))
 
-(defun yf-eval-postfix (line)
+(defun yf-eval-postfix (line &optional initial-stack)
   "Evaluate LINE containing postfix expression."
-  (let* ((stack '())
+  (let* ((stack (or initial-stack '()))
          (dict (make-hash-table :test #'equal))
          (tokens (split-string line)))
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
