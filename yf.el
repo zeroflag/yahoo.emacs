@@ -75,8 +75,9 @@
                     :headers '(("Accept" . "application/json")
                                ("User-Agent" . yf-user-agent))
                     :parser 'json-read)))
-    (when (yf-http-success? (request-response-status-code response))
-      (yf-extract (request-response-data response)))))
+    (if (yf-http-success? (request-response-status-code response))
+        (yf-extract (request-response-data response))
+      (cons 0 yf-default-currency))))
 
 ;; Ticker prices
 
