@@ -16,11 +16,14 @@
 ```lisp
 (use-package! yf
   :defer t
-  :commands (yf-eval-current-line)
+  :commands (yf-eval-current-line yf-repl-mode)
   :init
   (map! :leader
-        :desc "Resolve tickers and currencies in the current line"
-        "y r" #'yf-eval-current-line))
+        :desc "Evel Yahoo Finance postfix expression."
+        "y e" #'yf-eval-current-line)
+  (map! :leader
+        :desc "Start Yahoo Finace REPL."
+        "y r" #'yf-repl-mode))
 ```
 
 ### Examples
