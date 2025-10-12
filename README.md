@@ -16,11 +16,11 @@
 ```lisp
 (use-package! yf
   :defer t
-  :commands (yf-resolve-in-line)
+  :commands (yf-eval-current-line)
   :init
   (map! :leader
         :desc "Resolve tickers and currencies in the current line"
-        "y r" #'yf-resolve-in-line))
+        "y r" #'yf-eval-current-line))
 ```
 
 ### Examples

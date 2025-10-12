@@ -223,16 +223,69 @@
                       yf-default-currency) stack)))))
     stack))
 
-(defun yf-resolve-in-line ()
-  "Read and resolve both tickers and currency conversion expressions in current line."
+(defun yf-eval (line &optional stack)
+  "Read and resolve both tickers and currency conversion expressions from LINE."
+  (interactive)
+  (let* ((resolved (yf-resolve-tickers line))
+         (result (yf-eval-postfix resolved stack)))
+    (mapconcat #'yf-price-to-string result " ")))
+
+(defun yf-eval-current-line ()
+  "read and resolve both tickers and currency conversion expressions in current line."
   (interactive)
   (let* ((line (thing-at-point 'line t))
-         (resolved (yf-resolve-tickers line))
-         (result (yf-eval-postfix resolved))
-         (result (mapconcat #'yf-price-to-string result " ")))
+         (result (yf-eval line)))
     (beginning-of-line)
     (kill-line)
     (insert result)))
+
+(defvar yf-repl-buffer-name "*Yahoo Finance REPL*")
+(defvar yf-repl-stack '())
+(defvar yf-repl-prompt "yf>")
+
+(defun yf-insert-prompt ()
+  (insert yf-repl-prompt)
+  (insert " "))
+
+(defun yf-read-input ()
+  (buffer-substring-no-properties
+   (line-beginning-position)
+   (line-end-position)))
+
+(defun yf-on-line-entered ()
+  (interactive)
+  (let* ((input (yf-read-input))
+         (input (if (string-prefix-p yf-repl-prompt input)
+                    (substring input (length yf-repl-prompt))
+                  input))
+         (input (string-trim input))
+         (result (yf-eval input yf-repl-stack)))
+    (goto-char (point-max))
+    (insert "\n" result "\n\n")
+    (yf-insert-prompt)))
+
+(defvar yf-repl-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET") #'yf-on-line-entered)
+    map)
+  "Keymap for `yf-repl-mode'.")
+
+(define-derived-mode yf-repl-mode fundamental-mode "YAHOO-FINANCE-REPL"
+  (setq-local inhibit-read-only t)
+  (setq-local truncate-lines t)
+  (use-local-map yf-repl-mode-map))
+
+(defun yf-start-repl ()
+  "Start the Yahoo Finance REPL."
+  (interactive)
+  (setq yf-repl-stack '())
+  (let ((buf (get-buffer-create yf-repl-buffer-name)))
+    (with-current-buffer buf
+      (unless (derived-mode-p 'yf-repl-mode)
+        (yf-repl-mode)
+        (erase-buffer)
+        (yf-insert-prompt)))
+    (pop-to-buffer buf)))
 
 (provide 'yf)
 
