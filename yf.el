@@ -166,6 +166,7 @@
   (when (not (yf-is-currency? dst-currency))
     (user-error "Not a valid currency %s" dst-currency))
   (let* ((amount (car num-with-currency))
+         (dst-currency (upcase dst-currency))
          (src-currency (cdr num-with-currency)))
     (when (not (yf-is-currency? src-currency))
       (user-error "Not a valid currency %s" src-currency))
@@ -209,7 +210,7 @@
     (puthash "to" (lambda ()
                     (let ((currency (car tokens)))
                       (push (yf-to (pop stack) currency) stack))
-                    (setq tokens (cdr tokens))) dict)
+                    (setq tokens (cdr tokens))) dict) ;; consume next
     (while tokens
       (let ((tok (car tokens)))
         (setq tokens (cdr tokens))
@@ -217,7 +218,8 @@
          ((gethash tok dict)
           (funcall (gethash tok dict)))
          ((yf-is-currency? tok)
-          (push (cons (car (pop stack)) tok) stack))
+          (push (cons (car (pop stack))
+                      (upcase tok)) stack))
          (t
           (push (cons (yf-tonum tok)
                       yf-default-currency) stack)))))
@@ -231,7 +233,7 @@
     (mapconcat #'yf-price-to-string result " ")))
 
 (defun yf-eval-current-line ()
-  "read and resolve both tickers and currency conversion expressions in current line."
+  "Read and resolve both tickers and currency conversion expressions in current line."
   (interactive)
   (let* ((line (thing-at-point 'line t))
          (result (yf-eval line)))
