@@ -45,3 +45,11 @@
              '((1 . "ANY") (2 . "ANY") (1 . "ANY"))))
   (should (equal (yf-eval-postfix "3 drop") nil)))
              
+(ert-deftest yf-depth-test ()
+  (should (equal (yf-eval-postfix "depth")
+             '((0 . "ANY"))))
+  (should (equal (yf-eval-postfix "0 depth")
+             '((1 . "ANY") (0 . "ANY"))))
+  (should (equal (yf-eval-postfix "1 1 1 1 depth")
+             '((4 . "ANY")
+               (1 . "ANY") (1 . "ANY") (1 . "ANY") (1 . "ANY")))))
