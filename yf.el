@@ -251,7 +251,9 @@
 (defconst yf-repl-prompt "(yf) $")
 
 (defun yf-insert-prompt ()
-  (insert yf-repl-prompt)
+  (insert (propertize
+           yf-repl-prompt
+           'face '(:foreground "magenta" :weight bold)))
   (insert " "))
 
 (defun yf-read-input ()
@@ -268,7 +270,7 @@
          (input (string-trim input)))
     (setq yf-repl-stack (yf-eval input yf-repl-stack)))
   (goto-char (point-max))
-  (insert "\n" (yf-show-stack yf-repl-stack) "\n\n")
+  (insert "\n" (yf-show-stack yf-repl-stack) "\n")
   (yf-insert-prompt))
 
 (defvar yf-repl-mode-map
