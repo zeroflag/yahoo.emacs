@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ "main" ]
     
-  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,11 +13,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install emacs (Linux)
+      - name: Install Emacs
         uses: purcell/setup-emacs@master
         with:
           version: 28.2
-
+          
+      - name: Install dependencies
+        run: |
+          emacs -Q --batch --eval "(package-initialize)" \
+                --eval "(package-refresh-contents)" \
+                --eval "(package-install 'request)" \
+                --eval "(package-install 'json)" \
+                
       - uses: leotaku/elisp-check@master
         with:
          check: ert
