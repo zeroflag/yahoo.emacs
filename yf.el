@@ -231,19 +231,28 @@
 (defun yf-show-stack (stack)
   (mapconcat #'yf-price-to-string stack " "))
 
-(defun yf-eval (line &optional stack)
-  "Read and resolve both tickers and currency conversion expressions from LINE."
+(defun yf-eval (text &optional stack)
+  "Read and eval TEXT by resolving tickers and currency conversions."
   (interactive)
-  (let* ((resolved (yf-resolve-tickers line)))
+  (let* ((resolved (yf-resolve-tickers text)))
     (yf-eval-postfix resolved stack)))
 
 (defun yf-eval-current-line ()
-  "Read and resolve both tickers and currency conversion expressions in current line."
+  "Read and eval current line by resolving tickers and currency conversions."
   (interactive)
   (let* ((line (thing-at-point 'line t))
          (stack (yf-eval line)))
     (beginning-of-line)
     (kill-line)
+    (insert (yf-show-stack stack))))
+
+(defun yf-eval-buffer ()
+  "Read and eval current buffer by resolving tickers and currency conversions."
+  (interactive)
+  (let* ((text (buffer-string))
+         (stack (yf-eval text)))
+    (goto-char (point-max))
+    (insert "\n")
     (insert (yf-show-stack stack))))
 
 (defvar yf-repl-stack '())

@@ -16,11 +16,17 @@
 ```lisp
 (use-package! yf
   :defer t
-  :commands (yf-eval-current-line yf-repl-mode yf-start-repl)
+  :commands (yf-eval-current-line
+             yf-eval-buffer
+             yf-repl-mode
+             yf-start-repl)
   :init
   (map! :leader
-        :desc "Evel Yahoo Finance postfix expression."
+        :desc "Eval line as Yahoo Finance postfix expression."
         "y e" #'yf-eval-current-line)
+  (map! :leader
+        :desc "Eval buffer as Yahoo Finance postfix expression."
+        "y b" #'yf-eval-buffer)
   (map! :leader
         :desc "Start Yahoo Finace REPL."
         "y s" #'yf-start-repl)
