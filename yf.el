@@ -206,6 +206,7 @@
     (puthash "dup" (lambda () (push (car stack) stack)) dict)
     (puthash "over" (lambda () (push (cadr stack) stack)) dict)
     (puthash "drop" (lambda () (pop stack)) dict)
+    (puthash "clear" (lambda () (setq stack '())) dict)
     (puthash "depth" (lambda () (push (cons (length stack)
                                             yf-default-currency)
                                       stack)) dict)

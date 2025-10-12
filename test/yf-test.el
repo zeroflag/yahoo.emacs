@@ -53,3 +53,7 @@
   (should (equal (yf-eval-postfix "1 1 1 1 depth")
              '((4 . "ANY")
                (1 . "ANY") (1 . "ANY") (1 . "ANY") (1 . "ANY")))))
+
+(ert-deftest yf-clear-test ()
+  (should (equal (yf-eval-postfix "1 2 3 4 5 clear depth")
+             '((0 . "ANY")))))
