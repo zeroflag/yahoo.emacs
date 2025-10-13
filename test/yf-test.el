@@ -65,3 +65,17 @@
 (ert-deftest yf-clear-test ()
   (should (equal (yf-eval-postfix "1 2 3 4 5 clear depth")
                  '((0 . "ANY")))))
+
+(ert-deftest yf-comment-test ()
+  (should (equal (yf-eval-postfix
+                  "( comment 1 ) 3
+                   ( comment 2 ) 4
+                   ( comment 3 ) +
+                   ( comment 4 )")
+                 '((7 . "ANY")))))
+
+(ert-deftest yf-multi-line-comment-test ()
+  (should (equal (yf-eval-postfix
+                  "( comment \n 1 2 3 \n ) \n 3 2 +
+                   ( comment .. )")
+                 '((5 . "ANY")))))
