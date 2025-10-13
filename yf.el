@@ -174,6 +174,14 @@
     (cons (/ (float n1) n2)
           (yf-pick-currency a b))))
 
+(defun yf-prod-pairs (xs)
+  (if (< (length xs) 2)
+     xs 
+    (let ((first (car xs))
+          (second (cadr xs)))
+      (cons (yf-mul first second)
+            (yf-prod-pairs (cddr xs))))))
+
 (defun yf-tonum (str)
   (if (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str)
       (string-to-number str)
@@ -216,6 +224,11 @@
                  (push (yf-div a b) stack)))
              dict)
     (puthash "sum" (lambda () (setq stack (yf-sum-currency-groups stack))) dict)
+    (puthash "sumprod"
+             (lambda ()
+               (setq stack (yf-prod-pairs stack))
+               (setq stack (yf-sum-currency-groups stack)))
+             dict)
     (puthash "swap"
              (lambda ()
                (let ((a (pop stack))

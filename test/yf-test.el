@@ -79,3 +79,11 @@
                   "( comment \n 1 2 3 \n ) \n 3 2 +
                    ( comment .. )")
                  '((5 . "ANY")))))
+
+(ert-deftest yf-sumprod-test ()
+  (should (equal (yf-eval-postfix "sumprod") '()))
+  (should (equal (yf-eval-postfix "2 3 sumprod") '((6 . "ANY"))))
+  (should (equal (yf-eval-postfix "2 3 4 sumprod") '((14 . "ANY"))))
+  (should (equal (yf-eval-postfix "2 3 4 5 sumprod") '((26 . "ANY"))))
+  (should (equal (yf-eval-postfix "2 3 4 5 6 sumprod") '((44 . "ANY"))))
+  (should (equal (yf-eval-postfix "2 3 4 5 6 7 sumprod") '((68 . "ANY")))))
