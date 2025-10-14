@@ -28,6 +28,9 @@
         :desc "Eval buffer as Yahoo Finance postfix expression."
         "y b" #'yf-eval-buffer)
   (map! :leader
+        :desc "Delete all overlays created by yf."
+        "y d" #'yf-delete-overlays)
+  (map! :leader
         :desc "Start Yahoo Finace REPL."
         "y s" #'yf-start-repl)
   (map! :leader
