@@ -310,7 +310,8 @@
           (push (yf-resolve-ticker tok) stack))
          (t
           (user-error
-           "Unkown word: %s at: %d-%d" tok tok-start tok-end)))))
+           "Unkown word: %s at: %d-%d" tok tok-start tok-end))))
+      (sit-for 0))
     stack))
 
 (defun yf-show-stack (stack)
