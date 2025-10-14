@@ -206,7 +206,9 @@
         (setq pos end)))
     (nreverse tokens)))
 
-(defun yf-next-token (tokens) (caar tokens))
+(defun yf-tok (tokens) (caar tokens))
+(defun yf-tok-start (tokens) (cadr (car tokens)))
+(defun yf-tok-end (tokens) (caddr (car tokens)))
 
 (defun yf-eval (text &optional stack)
   "Evaluate TEXT containing postfix expression."
@@ -252,19 +254,21 @@
              dict)
     (puthash "to"
              (lambda ()
-               (let ((currency (yf-next-token tokens)))
+               (let ((currency (yf-tok tokens)))
                  (push (yf-to (pop stack) currency) stack))
                (setq tokens (cdr tokens))) ;; consume next
              dict) 
     (puthash "("
              (lambda ()
                (while (and tokens
-                           (not (string= ")" (yf-next-token tokens))))
+                           (not (string= ")" (yf-tok tokens))))
                  (setq tokens (cdr tokens)))
                (setq tokens (cdr tokens)))
              dict)
     (while tokens
-      (let ((tok (yf-next-token tokens)))
+      (let ((tok (yf-tok tokens))
+            (start (yf-tok-start tokens))
+            (end (yf-tok-end tokens)))
         (setq tokens (cdr tokens))
         (cond
          ((gethash tok dict)
