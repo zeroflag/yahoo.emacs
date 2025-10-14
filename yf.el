@@ -69,15 +69,16 @@
 (defun yf-get (ticker)
   "Fetch stock price and currency of the given TICKER"
   (interactive "sTicker: ")
-  (let ((response (request (yf-api-url ticker)
-                    :type "GET"
-                    :sync t
-                    :headers '(("Accept" . "application/json")
-                               ("User-Agent" . yf-user-agent))
-                    :parser 'json-read)))
-    (if (yf-http-success? (request-response-status-code response))
+  (let* ((response (request (yf-api-url ticker)
+                     :type "GET"
+                     :sync t
+                     :headers '(("Accept" . "application/json")
+                                ("User-Agent" . yf-user-agent))
+                     :parser 'json-read))
+         (code (request-response-status-code response)))
+    (if (yf-http-success? code)
         (yf-extract (request-response-data response))
-      (cons 0 yf-default-currency))))
+      (error "Could not get price of %s. Status code: %d" ticker code))))
 
 ;; Ticker prices
 
@@ -182,10 +183,8 @@
       (cons (yf-mul first second)
             (yf-prod-pairs (cddr xs))))))
 
-(defun yf-tonum (str)
-  (if (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str)
-      (string-to-number str)
-    (user-error "Not a number: %s" str)))
+(defun yf-num? (str)
+  (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
 
 (defun yf-to (num-with-currency dst-currency)
   (when (not (yf-is-currency? dst-currency))
@@ -267,9 +266,10 @@
          ((yf-is-currency? tok)
           (push (cons (car (pop stack))
                       (upcase tok)) stack))
-         (t
-          (push (cons (yf-tonum tok)
-                      yf-default-currency) stack)))))
+         ((yf-num? tok)
+          (push (cons (string-to-number tok)
+                      yf-default-currency) stack))
+         (t (user-error "Unkown word: %s" tok)))))
     stack))
 
 (defun yf-show-stack (stack)
