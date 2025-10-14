@@ -25,7 +25,7 @@
 
 (defvar yf-debug nil)
 (defvar yf-overlays '())
-(defvar yf-overlay-color "yellow")
+(defvar yf-overlay-color "orange")
 
 (defconst yf-default-currency "ANY")
 
@@ -176,7 +176,8 @@
             (yf-prod-pairs (cddr xs))))))
 
 (defun yf-print-overlay (n tok-start tok-end)
-  (let ((overlay (make-overlay (1+ tok-start) (1+ tok-end))))
+  (let ((overlay (make-overlay (1+ tok-start)
+                               (1+ tok-end))))
     (push overlay yf-overlays)
     (overlay-put overlay
                  'after-string
