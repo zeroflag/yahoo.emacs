@@ -182,7 +182,7 @@
                  'after-string
                  (propertize
                   (concat " => " (yf-price-to-string n))
-                  'face '(:foreground yf-overlay-color)))))
+                  'face `(:foreground ,yf-overlay-color)))))
 
 (defun yf-delete-overlays ()
   "Delete all overlays created by YF."
