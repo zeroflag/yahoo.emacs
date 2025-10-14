@@ -23,6 +23,8 @@
 (defun yf-api-url (ticker)
   (concat yf-api-url "/" ticker))
 
+(defvar yf-debug nil)
+
 (defconst yf-default-currency "ANY")
 
 (defconst yf-currency-codes
@@ -167,6 +169,15 @@
       (cons (yf-mul first second)
             (yf-prod-pairs (cddr xs))))))
 
+(defun yf-print (n tok-start tok-end)
+  (message "%d-%d" tok-start tok-end)
+  (let ((overlay (make-overlay tok-start tok-end)))
+    (overlay-put overlay 'after-string
+                 (propertize (yf-price-to-string n)
+                             'face
+                             '(:foreground "yellow")))
+    (run-at-time "5 sec" nil #'delete-overlay overlay)))
+
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
 
@@ -198,7 +209,7 @@
   "Parse TEXT and return tokens in the following format: ( ( token start end ) .. )."
   (let ((pos 0)
         (tokens '()))
-    (while (string-match "\\S-+" text pos)
+    (while (string-match "[^[:space:]\r\n]+" text pos)
       (let ((start (match-beginning 0))
             (end   (match-end 0))
             (token (match-string 0 text)))
@@ -214,10 +225,12 @@
   "Evaluate TEXT containing postfix expression."
   (interactive)
   (let* ((dict (make-hash-table :test #'equal))
-         (tokens (yf-parse text)))
+         (tokens (yf-parse text))
+         (tok-start 0)
+         (tok-end 0))
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
     (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
-    (puthash "." (lambda () (message "%s" (pop stack))) dict)
+    (puthash "." (lambda () (yf-print (pop stack) tok-start tok-end)) dict)
     (puthash "-"
              (lambda ()
                (let ((b (pop stack))
@@ -266,10 +279,12 @@
                (setq tokens (cdr tokens)))
              dict)
     (while tokens
-      (let ((tok (yf-tok tokens))
-            (start (yf-tok-start tokens))
-            (end (yf-tok-end tokens)))
+      (let ((tok (yf-tok tokens)))
+        (setq tok-start (yf-tok-start tokens))
+        (setq tok-end (yf-tok-end tokens))
         (setq tokens (cdr tokens))
+        (when yf-debug
+          (message "eval token: '%s' at: %d-%d" tok tok-start tok-end))
         (cond
          ((gethash tok dict)
           (funcall (gethash tok dict)))
@@ -282,7 +297,8 @@
          ((yf-ticker? tok)
           (push (yf-resolve-ticker tok) stack))
          (t
-          (user-error "Unkown word: %s" tok)))))
+          (user-error
+           "Unkown word: %s at: %d-%d" tok tok-start tok-end)))))
     stack))
 
 (defun yf-show-stack (stack)
