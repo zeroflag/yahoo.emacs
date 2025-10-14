@@ -80,13 +80,6 @@
         (yf-extract (request-response-data response))
       (error "Could not get price of %s. Status code: %d" ticker code))))
 
-;; Ticker prices
-
-(defun yf-get-price (ticker)
-  "Fetch stock price of the given TICKER"
-  (interactive "sTicker: ")
-  (car (yf-get ticker)))
-
 (defun yf-price-to-string (price)
   (concat (format "%.2f" (car price)) " "
           (if (yf-is-default-currency? (cdr price))
@@ -198,7 +191,7 @@
   (string-match "\\$\\([[:word:].]+\\)" token))
 
 (defun yf-resolve-ticker (token)
-  (let* ((ticker (match-string 1 token)))
+  (let ((ticker (match-string 1 token)))
     (yf-get ticker)))
 
 (defun yf-eval (text &optional stack)

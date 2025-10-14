@@ -39,6 +39,5 @@
 
 ```lisp
 (yf-get "QQQ")
-(yf-get-price "QQQ")
 (yf-convert 100 "USD" "EUR")
 ```
