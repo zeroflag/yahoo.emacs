@@ -332,8 +332,8 @@
   (let* ((text (buffer-string))
          (stack (yf-eval text)))
     (goto-char (point-max))
-    (insert "\n")
-    (insert (yf-show-stack stack))))
+    (when stack
+      (insert (concat " ( " (yf-show-stack stack) " ) ")))))
 
 (defvar yf-repl-stack '())
 (defconst yf-repl-buffer-name "*Yahoo Finance REPL*")
