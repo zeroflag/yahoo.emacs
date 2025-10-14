@@ -170,12 +170,14 @@
             (yf-prod-pairs (cddr xs))))))
 
 (defun yf-print (n tok-start tok-end)
-  (let ((overlay (make-overlay tok-start tok-end)))
-    (overlay-put overlay 'after-string
-                 (propertize (yf-price-to-string n)
-                             'face
-                             '(:foreground "yellow")))
-    (run-at-time "5 sec" nil #'delete-overlay overlay)))
+  (let ((overlay (make-overlay (1+ tok-start) (1+ tok-end))))
+    (overlay-put overlay
+                 'after-string
+                  ;; 'keymap (lambda () (delete-overlay overlay))
+                 (propertize
+                  (concat " => " (yf-price-to-string n))
+                  'face '(:foreground "yellow")))
+    (run-at-time "15 sec" nil #'delete-overlay overlay)))
 
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
