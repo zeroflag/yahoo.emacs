@@ -235,6 +235,7 @@
 (defun yf-eval (text &optional stack)
   "Evaluate TEXT containing postfix expression."
   (interactive)
+  (yf-delete-overlays)
   (let* ((dict (make-hash-table :test #'equal))
          (tokens (yf-parse text))
          (tok-start 0)
