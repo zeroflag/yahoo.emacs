@@ -170,7 +170,6 @@
             (yf-prod-pairs (cddr xs))))))
 
 (defun yf-print (n tok-start tok-end)
-  (message "%d-%d" tok-start tok-end)
   (let ((overlay (make-overlay tok-start tok-end)))
     (overlay-put overlay 'after-string
                  (propertize (yf-price-to-string n)
@@ -284,7 +283,7 @@
         (setq tok-end (yf-tok-end tokens))
         (setq tokens (cdr tokens))
         (when yf-debug
-          (message "eval token: '%s' at: %d-%d" tok tok-start tok-end))
+          (message "[yf] eval token: '%s' at: %d-%d" tok tok-start tok-end))
         (cond
          ((gethash tok dict)
           (funcall (gethash tok dict)))
