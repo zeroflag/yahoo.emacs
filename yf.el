@@ -24,6 +24,7 @@
   (concat yf-api-url "/" ticker))
 
 (defvar yf-debug nil)
+(defvar yf-overlays '())
 
 (defconst yf-default-currency "ANY")
 
@@ -71,6 +72,8 @@
 (defun yf-get (ticker)
   "Fetch stock price and currency of the given TICKER"
   (interactive "sTicker: ")
+  (when yf-debug
+    (message "[yf] Fetching price of %s" ticker))
   (let* ((response (request (yf-api-url ticker)
                      :type "GET"
                      :sync t
@@ -78,6 +81,8 @@
                                 ("User-Agent" . yf-user-agent))
                      :parser 'json-read))
          (code (request-response-status-code response)))
+    (when yf-debug
+      (message "[yf] status code: %d" code))
     (if (yf-http-success? code)
         (yf-extract (request-response-data response))
       (error "Could not get price of %s. Status code: %d" ticker code))))
@@ -169,15 +174,20 @@
       (cons (yf-mul first second)
             (yf-prod-pairs (cddr xs))))))
 
-(defun yf-print (n tok-start tok-end)
+(defun yf-print-overlay (n tok-start tok-end)
   (let ((overlay (make-overlay (1+ tok-start) (1+ tok-end))))
+    (push overlay yf-overlays)
     (overlay-put overlay
                  'after-string
-                  ;; 'keymap (lambda () (delete-overlay overlay))
                  (propertize
                   (concat " => " (yf-price-to-string n))
-                  'face '(:foreground "yellow")))
-    (run-at-time "15 sec" nil #'delete-overlay overlay)))
+                  'face '(:foreground "yellow")))))
+
+(defun yf-delete-overlays ()
+  "Delete all overlays created by YF."
+  (interactive)
+  (mapc #'delete-overlay yf-overlays)
+  (setq yf-overlays nil))
 
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
@@ -231,7 +241,7 @@
          (tok-end 0))
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
     (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
-    (puthash "." (lambda () (yf-print (pop stack) tok-start tok-end)) dict)
+    (puthash "." (lambda () (yf-print-overlay (pop stack) tok-start tok-end)) dict)
     (puthash "-"
              (lambda ()
                (let ((b (pop stack))
