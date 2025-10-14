@@ -194,11 +194,25 @@
   (let ((ticker (match-string 1 token)))
     (yf-get ticker)))
 
+(defun yf-parse (text)
+  "Parse TEXT and return tokens in the following format: ( ( token start end ) .. )."
+  (let ((pos 0)
+        (tokens '()))
+    (while (string-match "\\S-+" text pos)
+      (let ((start (match-beginning 0))
+            (end   (match-end 0))
+            (token (match-string 0 text)))
+        (push (list token start end) tokens)
+        (setq pos end)))
+    (nreverse tokens)))
+
+(defun yf-next-token (tokens) (caar tokens))
+
 (defun yf-eval (text &optional stack)
   "Evaluate TEXT containing postfix expression."
   (interactive)
   (let* ((dict (make-hash-table :test #'equal))
-         (tokens (split-string text)))
+         (tokens (yf-parse text)))
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
     (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
     (puthash "." (lambda () (message "%s" (pop stack))) dict)
@@ -238,19 +252,19 @@
              dict)
     (puthash "to"
              (lambda ()
-               (let ((currency (car tokens)))
+               (let ((currency (yf-next-token tokens)))
                  (push (yf-to (pop stack) currency) stack))
                (setq tokens (cdr tokens))) ;; consume next
              dict) 
     (puthash "("
              (lambda ()
                (while (and tokens
-                           (not (string= ")" (car tokens))))
+                           (not (string= ")" (yf-next-token tokens))))
                  (setq tokens (cdr tokens)))
                (setq tokens (cdr tokens)))
              dict)
     (while tokens
-      (let ((tok (car tokens)))
+      (let ((tok (yf-next-token tokens)))
         (setq tokens (cdr tokens))
         (cond
          ((gethash tok dict)
