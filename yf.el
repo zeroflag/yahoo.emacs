@@ -274,10 +274,11 @@
   "Read and eval current line by resolving tickers and currency conversions."
   (interactive)
   (let* ((line (thing-at-point 'line t))
+         (end (line-end-position))
          (stack (yf-eval line)))
-    (beginning-of-line)
-    (kill-line)
-    (insert (yf-show-stack stack))))
+    (save-excursion
+      (goto-char end)
+      (insert (concat " ( " (yf-show-stack stack) " ) ")))))
 
 (defun yf-eval-buffer ()
   "Read and eval current buffer by resolving tickers and currency conversions."
