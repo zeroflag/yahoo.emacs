@@ -25,6 +25,7 @@
 
 (defvar yf-debug nil)
 (defvar yf-overlays '())
+(defvar yf-overlay-color "yellow")
 
 (defconst yf-default-currency "ANY")
 
@@ -181,7 +182,7 @@
                  'after-string
                  (propertize
                   (concat " => " (yf-price-to-string n))
-                  'face '(:foreground "yellow")))))
+                  'face '(:foreground yf-overlay-color)))))
 
 (defun yf-delete-overlays ()
   "Delete all overlays created by YF."
