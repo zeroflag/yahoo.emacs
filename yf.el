@@ -93,15 +93,6 @@
               ""
             (cdr price))))
 
-(defun yf-resolve-tickers (line)
-  "Read the tickers (e.g.: $SPY) from the LINE and replace them with their price."
-  (let ((regexp "\\$\\([[:word:].]+\\)"))
-    (while (string-match regexp line)
-      (let* ((ticker (match-string 1 line))
-             (price (yf-price-to-string (yf-get ticker))))
-        (setq line (string-replace (concat "$" ticker) price line))))
-    line))
-
 ;; Exchange rates
 
 (defun yf-xchg-rate (src-currency dst-currency)
@@ -177,7 +168,7 @@
 
 (defun yf-prod-pairs (xs)
   (if (< (length xs) 2)
-     xs 
+      xs 
     (let ((first (car xs))
           (second (cadr xs)))
       (cons (yf-mul first second)
@@ -203,10 +194,18 @@
       (cons (yf-convert amount src-currency dst-currency)
             dst-currency)))))
 
-(defun yf-eval-postfix (line &optional stack)
-  "Evaluate LINE containing postfix expression."
+(defun yf-ticker? (token)
+  (string-match "\\$\\([[:word:].]+\\)" token))
+
+(defun yf-resolve-ticker (token)
+  (let* ((ticker (match-string 1 token)))
+    (yf-get ticker)))
+
+(defun yf-eval (text &optional stack)
+  "Evaluate TEXT containing postfix expression."
+  (interactive)
   (let* ((dict (make-hash-table :test #'equal))
-         (tokens (split-string line)))
+         (tokens (split-string text)))
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
     (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
     (puthash "." (lambda () (message "%s" (pop stack))) dict)
@@ -269,17 +268,14 @@
          ((yf-num? tok)
           (push (cons (string-to-number tok)
                       yf-default-currency) stack))
-         (t (user-error "Unkown word: %s" tok)))))
+         ((yf-ticker? tok)
+          (push (yf-resolve-ticker tok) stack))
+         (t
+          (user-error "Unkown word: %s" tok)))))
     stack))
 
 (defun yf-show-stack (stack)
   (mapconcat #'yf-price-to-string stack " "))
-
-(defun yf-eval (text &optional stack)
-  "Read and eval TEXT by resolving tickers and currency conversions."
-  (interactive)
-  (let* ((resolved (yf-resolve-tickers text)))
-    (yf-eval-postfix resolved stack)))
 
 (defun yf-eval-current-line ()
   "Read and eval current line by resolving tickers and currency conversions."
