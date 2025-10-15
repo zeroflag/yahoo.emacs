@@ -63,13 +63,15 @@
 (defun yf-is-default-currency? (s)
   (string= (upcase s) (upcase yf-default-currency)))
 
-(defun yf-extract (json)
+(defun yf-extract (json ticker)
   (let* ((chart    (assoc-default 'chart json))
          (result   (assoc-default 'result chart))
          (data     (aref result 0))
          (meta     (assoc-default 'meta data))
          (price    (assoc-default 'regularMarketPrice meta))
          (currency (assoc-default 'currency meta)))
+    (when (or (not price) (not currency))
+      (error "Missing price and/or currency of '%s'" ticker))
     (if (string= "GBp" currency)
         (cons (/ price 100) currency)
       (cons price currency))))
@@ -90,7 +92,7 @@
          (code (request-response-status-code response)))
     (yf-debug-message "Status code: %d" code)
     (if (yf-http-success? code)
-        (yf-extract (request-response-data response))
+        (yf-extract (request-response-data response) ticker)
       (error "Could not get price of %s. Status code: %d" ticker code))))
 
 (defun yf-memoize (f)
@@ -131,7 +133,8 @@
 (defun yf-convert (amount src-currency dst-currency)
   "Convert AMOUNT from SRC-CURRENCY to DST-CURRENCY."
   (interactive)
-  (if (string= (upcase src-currency) (upcase dst-currency))
+  (if (string= (upcase src-currency)
+               (upcase dst-currency))
       amount
     (let ((rate (yf-xchg-rate src-currency dst-currency)))
       (* rate amount))))
