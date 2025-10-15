@@ -26,6 +26,7 @@
 (defvar yf-debug nil)
 (defvar yf-overlays '())
 (defvar yf-overlay-color "orange")
+(defvar yf-cache-ttl-sec 60)
 
 (defconst yf-default-currency "ANY")
 
@@ -55,7 +56,9 @@
 
 (defmacro yf-debug-message (fmt &rest args)
   `(when yf-debug
-     (message (concat "[yf] " ,fmt) ,@args)))
+     (let* ((now (format-time-string "%Y-%m-%d %H:%M:%S"))
+            (prefix (format "(yf) [%s] " now)))
+       (message (concat prefix ,fmt) ,@args))))
 
 (defun yf-is-default-currency? (s)
   (string= (upcase s) (upcase yf-default-currency)))
@@ -95,11 +98,18 @@
   (let* ((cache (make-hash-table :test 'equal))
          (memoized
           (lambda (&rest args)
-            (let ((result (gethash args cache)))
-              (unless result
-                (setq result (apply f args))
-                (puthash args result cache))
-              result))))
+            (let* ((entry (gethash args cache))
+                   (value (car entry))
+                   (timestamp (cdr entry))
+                   (now (float-time)))
+              (when (or (not value) (> (- now timestamp) yf-cache-ttl-sec))
+                (setq value (apply f args))
+                (yf-debug-message "Saving '%s' => '%s' to cache. TTL: %d"
+                                  args
+                                  value
+                                  yf-cache-ttl-sec)
+                (puthash args (cons value now) cache))
+              value))))
     memoized))
 
 (defun yf-get (ticker) "stub" ticker)
