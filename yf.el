@@ -296,7 +296,10 @@
                (setq tokens (cdr tokens)))
              dict)
     (while tokens
-      (let ((tok (yf-tok tokens)))
+      (let* ((tok (yf-tok tokens))
+             (index 0)
+             (size (length tokens))
+             (progress (make-progress-reporter "[yf] Running.." 0 size)))
         (setq tok-start (+ tok-offset (yf-tok-start tokens)))
         (setq tok-end (+ tok-offset (yf-tok-end tokens)))
         (setq tokens (cdr tokens))
@@ -315,8 +318,10 @@
           (push (yf-resolve-ticker tok) stack))
          (t
           (user-error
-           "Unkown word: %s at: %d-%d" tok tok-start tok-end))))
-      (sit-for 0))
+           "Unkown word: %s at: %d-%d" tok tok-start tok-end)))
+        (progress-reporter-update progress index)
+        (setq index (1+ index))
+        (sit-for 0)))
     stack))
 
 (defun yf-show-stack (stack)
