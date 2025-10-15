@@ -117,8 +117,17 @@
 (defun yf-get (ticker) "stub" ticker)
 (fset 'yf-get (yf-memoize #'yf--get))
 
+(defun yf-add-number-grouping (number &optional separator)
+  (let ((num (format "%.2f" number))
+        (op (or separator ",")))
+    (while (string-match "\\(.*[0-9]\\)\\([0-9][0-9][0-9].*\\)" num)
+      (setq num (concat
+                 (match-string 1 num) op
+                 (match-string 2 num))))
+    num))
+
 (defun yf-price-to-string (price)
-  (concat (format "%.2f" (car price)) " "
+  (concat (yf-add-number-grouping (car price)) " "
           (if (yf-is-default-currency? (cdr price))
               ""
             (cdr price))))
