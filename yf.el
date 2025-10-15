@@ -131,8 +131,10 @@
 (defun yf-convert (amount src-currency dst-currency)
   "Convert AMOUNT from SRC-CURRENCY to DST-CURRENCY."
   (interactive)
-  (let ((rate (yf-xchg-rate src-currency dst-currency)))
-    (* rate amount)))
+  (if (string= (upcase src-currency) (upcase dst-currency))
+      amount
+    (let ((rate (yf-xchg-rate src-currency dst-currency)))
+      (* rate amount))))
 
 ;; Expression evaluator
 
