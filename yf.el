@@ -234,14 +234,15 @@
 (defun yf-tok-start (tokens) (cadr (car tokens)))
 (defun yf-tok-end (tokens) (caddr (car tokens)))
 
-(defun yf-eval (text &optional stack)
+(defun yf-eval (text &optional stack offset)
   "Evaluate TEXT containing postfix expression."
   (interactive)
   (yf-delete-overlays)
   (let* ((dict (make-hash-table :test #'equal))
          (tokens (yf-parse text))
          (tok-start 0)
-         (tok-end 0))
+         (tok-end 0)
+         (tok-offset (or offset 0)))
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
     (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
     (puthash "." (lambda () (yf-print-overlay (pop stack) tok-start tok-end)) dict)
@@ -295,8 +296,8 @@
              dict)
     (while tokens
       (let ((tok (yf-tok tokens)))
-        (setq tok-start (yf-tok-start tokens))
-        (setq tok-end (yf-tok-end tokens))
+        (setq tok-start (+ tok-offset (yf-tok-start tokens)))
+        (setq tok-end (+ tok-offset (yf-tok-end tokens)))
         (setq tokens (cdr tokens))
         (when yf-debug
           (message "[yf] eval token: '%s' at: %d-%d" tok tok-start tok-end))
@@ -324,20 +325,16 @@
   "Read and eval current line by resolving tickers and currency conversions."
   (interactive)
   (let* ((line (thing-at-point 'line t))
-         (end (line-end-position))
-         (stack (yf-eval line)))
-    (save-excursion
-      (goto-char end)
-      (insert (concat " ( " (yf-show-stack stack) " ) ")))))
+         (offset (- (line-beginning-position) 1))
+         (stack (yf-eval line nil offset)))
+    (message (yf-show-stack stack))))
 
 (defun yf-eval-buffer ()
   "Read and eval current buffer by resolving tickers and currency conversions."
   (interactive)
   (let* ((text (buffer-string))
          (stack (yf-eval text)))
-    (goto-char (point-max))
-    (when stack
-      (insert (concat " ( " (yf-show-stack stack) " ) ")))))
+    (message (yf-show-stack stack))))
 
 (defvar yf-repl-stack '())
 (defconst yf-repl-buffer-name "*Yahoo Finance REPL*")
