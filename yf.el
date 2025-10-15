@@ -246,6 +246,7 @@
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
     (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
     (puthash "." (lambda () (yf-print-overlay (pop stack) tok-start tok-end)) dict)
+    (puthash "message" (lambda () (message (yf-price-to-string (pop stack)))) dict)
     (puthash "?" (lambda () (yf-print-overlay (car stack) tok-start tok-end)) dict)
     (puthash "-"
              (lambda ()
