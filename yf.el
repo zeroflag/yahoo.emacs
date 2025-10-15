@@ -126,7 +126,7 @@
                  (match-string 2 num))))
     num))
 
-(defun yf-price-to-string (price)
+(defun yf-to-string (price)
   (concat (yf-add-number-grouping (car price)) " "
           (if (yf-is-default-currency? (cdr price))
               ""
@@ -216,14 +216,14 @@
       (cons (yf-mul first second)
             (yf-prod-pairs (cddr xs))))))
 
-(defun yf-print-overlay (n tok-start tok-end)
+(defun yf-print-overlay (text tok-start tok-end)
   (let ((overlay (make-overlay (1+ tok-start)
                                (1+ tok-end))))
     (push overlay yf-overlays)
     (overlay-put overlay
                  'after-string
                  (propertize
-                  (concat " => " (yf-price-to-string n))
+                  (concat " => " text)
                   'face `(:foreground ,yf-overlay-color)))))
 
 (defun yf-delete-overlays ()
@@ -289,9 +289,10 @@
          (tok-offset (or offset 0)))
     (puthash "+" (lambda () (push (yf-add (pop stack) (pop stack)) stack)) dict)
     (puthash "*" (lambda () (push (yf-mul (pop stack) (pop stack)) stack)) dict)
-    (puthash "." (lambda () (yf-print-overlay (pop stack) tok-start tok-end)) dict)
-    (puthash "message" (lambda () (message (yf-price-to-string (pop stack)))) dict)
-    (puthash "?" (lambda () (yf-print-overlay (car stack) tok-start tok-end)) dict)
+    (puthash "." (lambda () (yf-print-overlay (yf-to-string (pop stack)) tok-start tok-end)) dict)
+    (puthash ".s" (lambda () (yf-print-overlay (yf-show-stack stack) tok-start tok-end)) dict)
+    (puthash "message" (lambda () (message (yf-to-string (pop stack)))) dict)
+    (puthash "?" (lambda () (yf-print-overlay (yf-to-string (car stack)) tok-start tok-end)) dict)
     (puthash "-"
              (lambda ()
                (let ((b (pop stack))
@@ -366,7 +367,7 @@
     stack))
 
 (defun yf-show-stack (stack)
-  (mapconcat #'yf-price-to-string stack " "))
+  (mapconcat #'yf-to-string stack " "))
 
 (defun yf-eval-current-line ()
   "Read and eval current line by resolving tickers and currency conversions."
