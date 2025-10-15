@@ -74,7 +74,7 @@
 (defun yf-http-success? (code)
   (and (<= code 299) (>= code 200)))
 
-(defun yf-get (ticker)
+(defun yf--get (ticker)
   "Fetch stock price and currency of the given TICKER"
   (interactive "sTicker: ")
   (yf-debug-message "Fetching price of %s" ticker)
@@ -89,6 +89,21 @@
     (if (yf-http-success? code)
         (yf-extract (request-response-data response))
       (error "Could not get price of %s. Status code: %d" ticker code))))
+
+(defun yf-memoize (f)
+  "Memoize the function F, which can take any number of arguments."
+  (let* ((cache (make-hash-table :test 'equal))
+         (memoized
+          (lambda (&rest args)
+            (let ((result (gethash args cache)))
+              (unless result
+                (setq result (apply f args))
+                (puthash args result cache))
+              result))))
+    memoized))
+
+(defun yf-get (ticker) "stub" ticker)
+(fset 'yf-get (yf-memoize #'yf--get))
 
 (defun yf-price-to-string (price)
   (concat (format "%.2f" (car price)) " "
@@ -122,7 +137,7 @@
         (string= (upcase c1) (upcase c2)))))
 
 (defun yf-check-currency (a b)
-  (when (not (yf-currency-match a b))
+  (unless (yf-currency-match a b)
     (user-error "Currency mismatch %s - %s" a b)))
 
 (defun yf-sum-currency-groups (xs)
@@ -197,12 +212,12 @@
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
 
 (defun yf-to (num-with-currency dst-currency)
-  (when (not (yf-is-currency? dst-currency))
+  (unless (yf-is-currency? dst-currency)
     (user-error "Not a valid currency %s" dst-currency))
   (let* ((amount (car num-with-currency))
          (dst-currency (upcase dst-currency))
          (src-currency (cdr num-with-currency)))
-    (when (not (yf-is-currency? src-currency))
+    (unless (yf-is-currency? src-currency)
       (user-error "Not a valid currency %s" src-currency))
     (cond
      ((yf-is-default-currency? src-currency)
