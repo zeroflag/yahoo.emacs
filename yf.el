@@ -21,7 +21,7 @@
   "https://query1.finance.yahoo.com/v8/finance/chart")
 
 (defun yf-api-url (ticker)
-  (concat yf-api-url "/" ticker))
+  (concat yf-api-url "/" (url-hexify-string ticker)))
 
 (defvar yf-debug nil)
 (defvar yf-overlays '())
@@ -104,7 +104,7 @@
                    (now (float-time)))
               (when (or (not value) (> (- now timestamp) yf-cache-ttl-sec))
                 (setq value (apply f args))
-                (yf-debug-message "Saving '%s' => '%s' to cache. TTL: %d"
+                (yf-debug-message "Saving '%s' => '%s' to cache. TTL=%d"
                                   args
                                   value
                                   yf-cache-ttl-sec)
@@ -239,7 +239,7 @@
             dst-currency)))))
 
 (defun yf-ticker? (token)
-  (string-match "\\$\\([[:word:].]+\\)" token))
+  (string-match "\\$\\([[:word:].=]+\\)" token))
 
 (defun yf-resolve-ticker (token)
   (let ((ticker (match-string 1 token)))
