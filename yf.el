@@ -53,6 +53,10 @@
 (dolist (code yf-currency-codes)
   (puthash code t yf-currency-set))
 
+(defmacro yf-debug-message (fmt &rest args)
+  `(when yf-debug
+     (message (concat "[yf] " ,fmt) ,@args)))
+
 (defun yf-is-default-currency? (s)
   (string= (upcase s) (upcase yf-default-currency)))
 
@@ -73,8 +77,7 @@
 (defun yf-get (ticker)
   "Fetch stock price and currency of the given TICKER"
   (interactive "sTicker: ")
-  (when yf-debug
-    (message "[yf] Fetching price of %s" ticker))
+  (yf-debug-message "Fetching price of %s" ticker)
   (let* ((response (request (yf-api-url ticker)
                      :type "GET"
                      :sync t
@@ -82,8 +85,7 @@
                                 ("User-Agent" . yf-user-agent))
                      :parser 'json-read))
          (code (request-response-status-code response)))
-    (when yf-debug
-      (message "[yf] status code: %d" code))
+    (yf-debug-message "Status code: %d" code)
     (if (yf-http-success? code)
         (yf-extract (request-response-data response))
       (error "Could not get price of %s. Status code: %d" ticker code))))
@@ -303,8 +305,7 @@
         (setq tok-start (+ tok-offset (yf-tok-start tokens)))
         (setq tok-end (+ tok-offset (yf-tok-end tokens)))
         (setq tokens (cdr tokens))
-        (when yf-debug
-          (message "[yf] eval token: '%s' at: %d-%d" tok tok-start tok-end))
+        (yf-debug-message "Eval token: '%s' at: %d-%d" tok tok-start tok-end)
         (cond
          ((gethash tok dict)
           (funcall (gethash tok dict)))
