@@ -61,7 +61,7 @@
       (unless (derived-mode-p 'yf-repl-mode)
         (yf-repl-mode)
         (erase-buffer)
-        (yf-insert-prompt)))
+        (yf-repl-insert-prompt)))
     (pop-to-buffer buf)))
 
 (provide 'yf-repl)
