@@ -25,10 +25,11 @@
 
 (defvar yf-debug nil)
 (defvar yf-overlays '())
-(defvar yf-overlay-color "orange")
+(defvar yf-overlay-color "green")
 (defvar yf-cache-ttl-sec 60)
 
 (defconst yf-default-currency "ANY")
+(defconst yf-ticker-regexp "\\$\\([[:word:].=]+\\)")
 
 (defconst yf-currency-codes
   `("AED" "AFN" "ALL" "AMD" "ANG" "AOA" "ARS" "AUD" "AWG" "AZN"
@@ -253,7 +254,7 @@
             dst-currency)))))
 
 (defun yf-ticker? (token)
-  (string-match "\\$\\([[:word:].=]+\\)" token))
+  (string-match yf-ticker-regexp token))
 
 (defun yf-resolve-ticker (token)
   (let ((ticker (match-string 1 token)))
@@ -435,7 +436,48 @@
         (yf-insert-prompt)))
     (pop-to-buffer buf)))
 
-(provide 'yf)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Editor support - Major Mode for .yf Files ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar yf-mode-map
+  (let ((map (make-sparse-keymap)))
+    ;; Example binding: (define-key map (kbd "C-c C-c") #'yf-eval-buffer)
+    map)
+  "Keymap for `yf-mode'.")
+
+(defvar yf-mode-syntax-table
+  (let ((st (make-syntax-table)))
+    (modify-syntax-entry ?\( "<" st)
+    (modify-syntax-entry ?\) ">" st)
+    st))
+
+(defvar yf-builtin-words
+  '("to" "clear" "depth" "dup" "swap"
+    "over" "sum" "sumprod" "message"))
+
+(defvar yf-builtin-symbols
+  '("+" "-" "*" "/" "?" "." ".s"))
+
+(defvar yf-font-lock-defaults
+  `((,(regexp-opt yf-currency-codes 'words) . font-lock-keyword-face)
+    (,(regexp-opt yf-builtin-words 'words) . font-lock-builtin-face)
+    (,(concat "\\<" yf-ticker-regexp "\\>") . font-lock-type-face)
+    ("\\<-?[0-9]+\\(\\.[0-9]+\\)?\\>" . font-lock-constant-face)
+    (,(regexp-opt yf-builtin-symbols) . font-lock-builtin-face)))
+
+(defun yf-indent-line ()
+  (interactive)
+  (beginning-of-line)
+  (delete-horizontal-space))
+
+(define-derived-mode yf-mode prog-mode "YF"
+  "Major mode for .yf files."
+  :syntax-table yf-mode-syntax-table
+  (setq-local font-lock-defaults `(,yf-font-lock-defaults))
+  (setq-local comment-start "(")
+  (setq-local comment-end ")")
+  (setq-local indent-line-function #'yf-indent-line))
 
 ;;Local Variables:
 ;; byte-compile-warnings: (not docstrings)
