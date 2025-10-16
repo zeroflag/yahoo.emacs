@@ -15,7 +15,7 @@
 
 (defvar yf-mode-map
   (let ((map (make-sparse-keymap)))
-    ;; Example binding: (define-key map (kbd "C-c C-c") #'yf-eval-buffer)
+    (define-key map (kbd "<escape>") #'yf-delete-overlays)
     map)
   "Keymap for `yf-mode'.")
 
