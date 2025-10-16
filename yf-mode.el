@@ -39,18 +39,12 @@
     ("\\<-?[0-9]+\\(\\.[0-9]+\\)?\\>" . font-lock-constant-face)
     (,(regexp-opt yf-builtin-symbols) . font-lock-builtin-face)))
 
-(defun yf-indent-line ()
-  (interactive)
-  (beginning-of-line)
-  (delete-horizontal-space))
-
 (define-derived-mode yf-mode prog-mode "YF"
   "Major mode for .yf files."
   :syntax-table yf-mode-syntax-table
   (setq-local font-lock-defaults `(,yf-font-lock-defaults))
   (setq-local comment-start "(")
-  (setq-local comment-end ")")
-  (setq-local indent-line-function #'yf-indent-line))
+  (setq-local comment-end ")"))
 
 (provide 'yf-mode)
 
