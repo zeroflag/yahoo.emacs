@@ -19,7 +19,7 @@
   :defer t
   :commands (yf-eval-current-line
              yf-eval-buffer
-             yf-start-repl)
+             yf-repl-start)
   :init
   (map! :leader
         :desc "Eval line as Yahoo Finance postfix expression."
