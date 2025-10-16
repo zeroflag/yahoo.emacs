@@ -19,7 +19,6 @@
   :defer t
   :commands (yf-eval-current-line
              yf-eval-buffer
-             yf-repl-mode
              yf-start-repl)
   :init
   (map! :leader
