@@ -14,7 +14,8 @@
 ### config.el
 
 ```lisp
-(use-package! yf
+(use-package! yf-mode
+  :mode "\\.yf"
   :defer t
   :commands (yf-eval-current-line
              yf-eval-buffer
@@ -32,10 +33,7 @@
         "y d" #'yf-delete-overlays)
   (map! :leader
         :desc "Start Yahoo Finace REPL."
-        "y s" #'yf-start-repl)
-  (map! :leader
-        :desc "Switch to Yahoo Finance REPL Mode."
-        "y r" #'yf-repl-mode))
+        "y s" #'yf-repl-start))
 ```
 
 ### Examples
