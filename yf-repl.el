@@ -14,8 +14,8 @@
 (require 'yf)
 
 (defvar yf-repl-stack '())
-(defconst yf-repl-buffer-name "*Yahoo Finance REPL*")
-(defconst yf-repl-prompt "(yf) $")
+(defconst yf-repl-buffer-name "*YF REPL*")
+(defconst yf-repl-prompt "(yf) %")
 
 (defun yf-repl-insert-prompt ()
   (insert (propertize
@@ -34,8 +34,10 @@
          (input (if (string-prefix-p yf-repl-prompt input)
                     (substring input (length yf-repl-prompt))
                   input))
-         (input (string-trim input)))
-    (setq yf-repl-stack (yf-eval input yf-repl-stack)))
+         (input (string-trim input))
+         (offset (+ (line-beginning-position)
+                    (length yf-repl-prompt))))
+    (setq yf-repl-stack (yf-eval input yf-repl-stack offset)))
   (goto-char (point-max))
   (insert "\n" (yf-show-stack yf-repl-stack) "\n")
   (yf-repl-insert-prompt))
@@ -46,7 +48,7 @@
     map)
   "Keymap for `yf-repl-mode'.")
 
-(define-derived-mode yf-repl-mode fundamental-mode "YAHOO-FINANCE-REPL"
+(define-derived-mode yf-repl-mode fundamental-mode "YF-REPL"
   (setq-local inhibit-read-only t)
   (setq-local truncate-lines t)
   (use-local-map yf-repl-mode-map))
@@ -55,7 +57,6 @@
   "Start the Yahoo Finance REPL."
   (interactive)
   (setq yf-repl-stack '())
-  (message "Starting Yahoo Finace REPL..")
   (let ((buf (get-buffer-create yf-repl-buffer-name)))
     (with-current-buffer buf
       (unless (derived-mode-p 'yf-repl-mode)
