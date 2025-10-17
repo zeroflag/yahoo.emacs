@@ -18,8 +18,7 @@
   :mode "\\.yf"
   :defer t
   :commands (yf-eval-current-line
-             yf-eval-buffer
-             yf-repl-start)
+             yf-eval-buffer)
   :init
   (map! :leader
         :desc "Eval line as Yahoo Finance postfix expression."
@@ -30,6 +29,14 @@
   (map! :leader
         :desc "Delete all overlays created by yf."
         "y d" #'yf-delete-overlays)
+  (map! :leader
+        :desc "Start Yahoo Finace REPL."
+        "y s" #'yf-repl-start))
+
+(use-package! yf-repl
+  :defer t
+  :commands yf-repl-start
+  :init
   (map! :leader
         :desc "Start Yahoo Finace REPL."
         "y s" #'yf-repl-start))
