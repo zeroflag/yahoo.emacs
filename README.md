@@ -28,10 +28,7 @@
         "y b" #'yf-eval-buffer)
   (map! :leader
         :desc "Delete all overlays created by yf."
-        "y d" #'yf-delete-overlays)
-  (map! :leader
-        :desc "Start Yahoo Finace REPL."
-        "y s" #'yf-repl-start))
+        "y d" #'yf-delete-overlays))
 
 (use-package! yf-repl
   :defer t
