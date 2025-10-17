@@ -13,12 +13,6 @@
 ;;;
 (require 'yf)
 
-(defvar yf-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "<escape>") #'yf-delete-overlays)
-    map)
-  "Keymap for `yf-mode'.")
-
 (defvar yf-mode-syntax-table
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?\( "<" st)
