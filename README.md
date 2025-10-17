@@ -18,7 +18,8 @@
   :mode "\\.yf"
   :defer t
   :commands (yf-eval-current-line
-             yf-eval-buffer)
+             yf-eval-buffer
+             yf-delete-overlays)
   :init
   (map! :leader
         :desc "Eval line as Yahoo Finance postfix expression."
