@@ -26,7 +26,7 @@
 (defvar yf-debug nil)
 (defvar yf-overlays '())
 (defvar yf-overlay-color "green")
-(defvar yf-cache-ttl-sec 60)
+(defvar yf-cache-ttl-sec (* 3 60))
 
 (defconst yf-default-currency "ANY")
 (defconst yf-ticker-regexp "\\$\\([[:word:].=]+\\)")
