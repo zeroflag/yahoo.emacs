@@ -16,8 +16,8 @@
 (require 'yf)
 (require 'yf-mode)
 
-(defvar-local yf-repl-stack nil
-  "Evaluation stack for the YF REPL session.")
+(defvar-local yf-stack
+   "Evaluation stack for the YF REPL session.")
 
 (defvar-local yf-repl-last-prompt-end 0)
 
@@ -30,9 +30,8 @@
   "File to save command history for `yf-repl-mode'.")
 
 (defun yf-repl--input-sender (proc input)
-  (setq yf-repl-stack
-        (yf-eval input yf-repl-stack (- yf-repl-last-prompt-end 1)))
-  (let ((output (yf-show-stack yf-repl-stack)))
+  (yf-eval input (- yf-repl-last-prompt-end 1))
+  (let ((output (yf-show-stack yf-stack)))
     (comint-output-filter proc (concat output "\n"))
     (comint-output-filter proc yf-repl-prompt))
   (setq yf-repl-last-prompt-end (point)))
@@ -73,7 +72,7 @@
 
 (defun yf-repl-restart ()
   (interactive)
-  (setq yf-repl-stack '())
+  (setq yf-stack '())
   (let ((buf (get-buffer yf-repl-buffer-name)))
     (when buf (kill-buffer buf))
     (yf-repl-start)))
