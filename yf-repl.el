@@ -11,59 +11,68 @@
 ;;;
 ;;; Code:
 ;;;
+
+(require 'comint)
 (require 'yf)
 
-(defvar yf-repl-stack '())
-(defconst yf-repl-buffer-name "*YF REPL*")
-(defconst yf-repl-prompt "(yf) %")
+(defvar yf-repl-stack nil
+  "Evaluation stack for the YF REPL session.")
 
-(defun yf-repl-insert-prompt ()
-  (insert (propertize
-           yf-repl-prompt
-           'face '(:foreground "magenta" :weight bold)))
-  (insert " "))
+(defconst yf-repl-name "*YF-REPL*")
+(defconst yf-repl-buffer-name (concat "*" yf-repl-name "*"))
+(defconst yf-repl-prompt "YF % ")
 
-(defun yf-repl-read-input ()
-  (buffer-substring-no-properties
-   (line-beginning-position)
-   (line-end-position)))
+(defvar yf-repl-history-file
+  (expand-file-name "yf-repl-history" user-emacs-directory)
+  "File to save command history for `yf-repl-mode'.")
 
-(defun yf-repl-on-line-entered ()
-  (interactive)
-  (let* ((input (yf-repl-read-input))
-         (input (if (string-prefix-p yf-repl-prompt input)
-                    (substring input (length yf-repl-prompt))
-                  input))
-         (input (string-trim input))
-         (offset (+ (line-beginning-position)
-                    (length yf-repl-prompt))))
-    (setq yf-repl-stack (yf-eval input yf-repl-stack offset)))
-  (goto-char (point-max))
-  (insert "\n" (yf-show-stack yf-repl-stack) "\n")
-  (yf-repl-insert-prompt))
+(defun yf-repl--input-sender (proc input)
+  (comint-add-to-input-history input)
+  (let ((offset (+ (line-beginning-position -1)
+                   (length yf-repl-prompt))))
+    (setq yf-repl-stack
+          (yf-eval input yf-repl-stack offset)))
+  (let ((output (yf-show-stack yf-repl-stack)))
+    (comint-output-filter proc (concat output "\n"))
+    (comint-output-filter proc yf-repl-prompt)))
 
-(defvar yf-repl-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") #'yf-repl-on-line-entered)
-    map)
-  "Keymap for `yf-repl-mode'.")
-
-(define-derived-mode yf-repl-mode fundamental-mode "YF-REPL"
-  (setq-local inhibit-read-only t)
-  (setq-local truncate-lines t)
-  (use-local-map yf-repl-mode-map))
+(define-derived-mode yf-repl-mode comint-mode "YF-REPL"
+  (setq-local comint-prompt-regexp (concat "^" (regexp-quote yf-repl-prompt)))
+  (setq-local comint-use-prompt-regexp t)
+  (setq-local comint-input-sender #'yf-repl--input-sender)
+  (setq-local comint-process-echoes nil)
+  (setq-local comint-prompt-read-only t))
 
 (defun yf-repl-start ()
   "Start the Yahoo Finance REPL."
   (interactive)
-  (setq yf-repl-stack '())
-  (let ((buf (get-buffer-create yf-repl-buffer-name)))
-    (with-current-buffer buf
-      (unless (derived-mode-p 'yf-repl-mode)
+  (let* ((buf (get-buffer-create yf-repl-buffer-name)))
+    (unless (comint-check-proc buf)
+      (with-current-buffer buf
         (yf-repl-mode)
-        (erase-buffer)
-        (yf-repl-insert-prompt)))
-    (pop-to-buffer buf)))
+        (apply #'make-comint-in-buffer yf-repl-name buf nil nil)
+        (let ((fake-proc (get-buffer-process buf)))
+          (set-process-query-on-exit-flag fake-proc nil)
+          (set-process-filter fake-proc 'comint-output-filter)
+          (set-process-sentinel fake-proc (lambda (&rest _) nil))
+          (set-process-buffer fake-proc buf)
+          (yf-repl--input-sender fake-proc "\n")))
+      (pop-to-buffer buf))))
+    
+(defun yf-repl-save-history ()
+  "Save the YF REPL command history."
+  (interactive)
+  (when (and (boundp 'comint-input-ring) comint-input-ring)
+    (comint-write-input-ring)))
+
+(defun yf-repl-restart ()
+  (interactive)
+  (setq yf-repl-stack '())
+  (let ((buf (get-buffer yf-repl-buffer-name)))
+    (when buf (kill-buffer buf))
+    (yf-repl-start)))
+
+(add-hook 'kill-emacs-hook #'yf-repl-save-history)
 
 (provide 'yf-repl)
 
