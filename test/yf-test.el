@@ -87,3 +87,7 @@
   (should (equal (yf-eval "2 3 4 5 sumprod") '((26 . "ANY"))))
   (should (equal (yf-eval "2 3 4 5 6 sumprod") '((44 . "ANY"))))
   (should (equal (yf-eval "2 3 4 5 6 7 sumprod") '((68 . "ANY")))))
+
+(ert-deftest yf-const-test ()
+  (should (equal (yf-eval "3.14 const pi pi") '((3.14 . "ANY"))))
+  (should (equal (yf-eval "42 USD const amt amt") '((42 . "USD")))))

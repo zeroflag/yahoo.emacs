@@ -20,8 +20,8 @@
     st))
 
 (defvar yf-builtin-words
-  '("to" "clear" "depth" "dup" "swap"
-    "over" "sum" "sumprod" "message"))
+  '("to" "clear" "depth" "dup" "swap" "over"
+    "const" "sum" "sumprod" "message"))
 
 (defvar yf-builtin-symbols
   '("+" "-" "*" "/" "?" "." ".s"))

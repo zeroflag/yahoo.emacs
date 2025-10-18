@@ -58,7 +58,7 @@
 (defmacro yf-debug-message (fmt &rest args)
   `(when yf-debug
      (let* ((now (format-time-string "%Y-%m-%d %H:%M:%S"))
-            (prefix (format "(yf) [%s] " now)))
+            (prefix (format "[yf] [%s] " now)))
        (message (concat prefix ,fmt) ,@args))))
 
 (defun yf-is-default-currency? (s)
@@ -332,6 +332,14 @@
              (lambda ()
                (let ((currency (yf-tok tokens)))
                  (push (yf-to (pop stack) currency) stack))
+               (setq tokens (cdr tokens))) ;; consume next
+             dict) 
+    (puthash "const"
+             (lambda ()
+               (let ((name (yf-tok tokens))
+                     (val (pop stack)))
+                 (yf-debug-message "Define constant %s with value %s" name val)
+                 (puthash name (lambda () (push val stack)) dict))
                (setq tokens (cdr tokens))) ;; consume next
              dict) 
     (puthash "("
