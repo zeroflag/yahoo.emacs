@@ -27,7 +27,6 @@
   "File to save command history for `yf-repl-mode'.")
 
 (defun yf-repl--input-sender (proc input)
-  (comint-add-to-input-history input)
   (let ((offset (+ (line-beginning-position -1)
                    (length yf-repl-prompt))))
     (setq yf-repl-stack
