@@ -15,7 +15,7 @@
 (require 'comint)
 (require 'yf)
 
-(defvar yf-repl-stack nil
+(defvar-local yf-repl-stack nil
   "Evaluation stack for the YF REPL session.")
 
 (defconst yf-repl-name "*YF-REPL*")

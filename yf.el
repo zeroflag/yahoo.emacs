@@ -368,7 +368,7 @@
     stack))
 
 (defun yf-show-stack (stack)
-  (mapconcat #'yf-to-string (nreverse stack) " "))
+  (mapconcat #'yf-to-string (reverse stack) " "))
 
 (defun yf-eval-current-line ()
   "Read and eval current line by resolving tickers and currency conversions."
