@@ -14,6 +14,7 @@
 
 (require 'comint)
 (require 'yf)
+(require 'yf-mode)
 
 (defvar-local yf-repl-stack nil
   "Evaluation stack for the YF REPL session.")
@@ -37,9 +38,14 @@
   (setq yf-repl-last-prompt-end (point)))
 
 (define-derived-mode yf-repl-mode comint-mode "YF-REPL"
+  :syntax-table yf-mode-syntax-table
+  (setq-local font-lock-defaults `(,yf-font-lock-defaults))
+  (setq-local comment-start "(")
+  (setq-local comment-end ")")
   (setq-local comint-prompt-regexp (concat "^" (regexp-quote yf-repl-prompt)))
   (setq-local comint-use-prompt-regexp t)
   (setq-local comint-input-sender #'yf-repl--input-sender)
+  (setq-local comint-highlight-input nil)
   (setq-local comint-process-echoes nil)
   (setq-local comint-prompt-read-only t))
 
