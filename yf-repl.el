@@ -18,6 +18,8 @@
 (defvar-local yf-repl-stack nil
   "Evaluation stack for the YF REPL session.")
 
+(defvar-local yf-repl-last-prompt-end 0)
+
 (defconst yf-repl-name "*YF-REPL*")
 (defconst yf-repl-buffer-name (concat "*" yf-repl-name "*"))
 (defconst yf-repl-prompt "YF % ")
@@ -27,13 +29,12 @@
   "File to save command history for `yf-repl-mode'.")
 
 (defun yf-repl--input-sender (proc input)
-  (let ((offset (+ (line-beginning-position -1)
-                   (length yf-repl-prompt))))
-    (setq yf-repl-stack
-          (yf-eval input yf-repl-stack offset)))
+  (setq yf-repl-stack
+        (yf-eval input yf-repl-stack (- yf-repl-last-prompt-end 1)))
   (let ((output (yf-show-stack yf-repl-stack)))
     (comint-output-filter proc (concat output "\n"))
-    (comint-output-filter proc yf-repl-prompt)))
+    (comint-output-filter proc yf-repl-prompt))
+  (setq yf-repl-last-prompt-end (point)))
 
 (define-derived-mode yf-repl-mode comint-mode "YF-REPL"
   (setq-local comint-prompt-regexp (concat "^" (regexp-quote yf-repl-prompt)))
