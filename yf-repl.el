@@ -62,8 +62,8 @@
           (set-process-filter fake-proc 'comint-output-filter)
           (set-process-sentinel fake-proc (lambda (&rest _) nil))
           (set-process-buffer fake-proc buf)
-          (yf-repl--input-sender fake-proc "\n")))
-      (pop-to-buffer buf))))
+          (yf-repl--input-sender fake-proc "\n"))))
+    (pop-to-buffer buf)))
     
 (defun yf-repl-save-history ()
   "Save the YF REPL command history."
