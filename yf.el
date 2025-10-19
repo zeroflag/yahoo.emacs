@@ -367,6 +367,10 @@
                 (yf-push a)
                 (yf-push c)
                 (yf-push b))))
+    (yf-def "shift"
+            (lambda ()
+              (let ((tos (yf-pop)))
+                (setq yf-stack (append yf-stack (list tos))))))
     (yf-def "dup" (lambda () (yf-push (yf-tos))))
     (yf-def "over" (lambda () (yf-push (yf-tos2))))
     (yf-def "drop" #'yf-pop)
