@@ -243,9 +243,9 @@
   (setq yf-overlays nil))
 
 (defun yf-refresh-word-list ()
-  (let (keys)
-    (maphash (lambda (k _v) (push k keys)) yf-dict)
-    (setq-local yf-word-list keys)))
+  (let (words)
+    (maphash (lambda (k _v) (push k words)) yf-dict)
+    (setq yf-word-list words)))
 
 (defun yf-words ()
   (mapconcat #'identity (reverse yf-word-list) " "))
@@ -298,6 +298,7 @@
 (defun yf-tos () (car yf-stack))
 (defun yf-tos2 () (cadr yf-stack))
 (defun yf-clear () (setq yf-stack '()))
+(defun yf-forget () (setq yf-dict '()))
 
 (defun yf-def (name lambda)
   "Define a new word with NAME and LAMBDA."
@@ -310,7 +311,7 @@
          (tok nil)
          (index 0)
          (size (length tokens))
-         (progress (make-progress-reporter "[yf] Running.. " 0 size))
+         (progress (make-progress-reporter "[yf] busy.. " 0 size))
          (tok-start 0)
          (tok-end 0)
          (tok-offset (or offset 0)))

@@ -21,7 +21,7 @@
 
 (defun yf-mode-builtin-words ()
   (unless yf-word-list
-    (yf-eval "")) ; initialize dictionary
+    (yf-eval "")) ; initialize dictionary with a dummy eval
   yf-word-list)
 
 (defun yf-mode-completion ()
@@ -45,7 +45,6 @@
   (setq-local completion-at-point-functions '(yf-mode-completion t))
   (setq-local comment-start "(")
   (setq-local comment-end ")"))
-
 
 (provide 'yf-mode)
 

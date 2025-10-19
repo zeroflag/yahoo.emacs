@@ -71,6 +71,7 @@
 (defun yf-repl-restart ()
   (interactive)
   (yf-clear)
+  (yf-forget)
   (let ((buf (get-buffer yf-repl-buffer-name)))
     (when buf (kill-buffer buf))
     (yf-repl-start)))
