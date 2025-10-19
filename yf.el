@@ -66,6 +66,11 @@
 (defvar-local yf-word-list nil
   "List of built-in and user defined words")
 
+(defvar-local yf-mode 'interpret
+  "Mode of the interpreter")
+
+(defvar-local yf-nested-quotation-cnt 0)
+
 (defmacro yf-debug-message (fmt &rest args)
   `(when yf-debug
      (let* ((now (format-time-string "%Y-%m-%d %H:%M:%S"))
@@ -249,8 +254,11 @@
     (maphash (lambda (k _v) (push k words)) yf-dict)
     (setq yf-word-list words)))
 
+(defun yf-join (xs &optional sep)
+  (mapconcat #'identity (reverse xs) (or sep " ")))
+
 (defun yf-words ()
-  (mapconcat #'identity (reverse yf-word-list) " "))
+  (yf-join yf-word-list))
 
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
@@ -312,6 +320,11 @@
 (defun yf-def (name lambda)
   "Define a new word with NAME and LAMBDA."
   (puthash (upcase name) lambda yf-dict))
+
+(defun yf-eval-quotation (tok)
+  (if (string= "]" tok) ;; TODO handle nesting
+      (setq yf-mode 'interpret)
+    (yf-push (cons tok (yf-pop)))))
 
 (defun yf-eval (text &optional offset)
   "Evaluate TEXT containing postfix expression."
@@ -391,6 +404,17 @@
                 (yf-def name (lambda () (yf-push val)))
                 (yf-refresh-word-list))
               (setq tokens (cdr tokens)))) ;; consume next
+    (yf-def "["
+            (lambda ()
+              (setq yf-mode 'quotation)
+              (setq yf-nested-quotation-cnt (1+ yf-nested-quotation-cnt))
+              (yf-push nil)))
+    (yf-def "TIMES"
+            (lambda ()
+              (let ((count (car (yf-pop)))
+                    (code (yf-join (yf-pop))))
+                (dotimes (_ count)
+                  (yf-eval code)))))
     (yf-def "WORDS" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))
     (yf-def "("
             (lambda ()
@@ -407,6 +431,8 @@
       (setq tokens (cdr tokens))
       (yf-debug-message "Eval token: '%s' at: %d-%d" tok tok-start tok-end)
       (cond
+       ((eq 'quotation yf-mode)
+        (yf-eval-quotation tok))
        ((gethash tok yf-dict)
         (funcall (gethash tok yf-dict)))
        ((yf-is-currency? tok)
