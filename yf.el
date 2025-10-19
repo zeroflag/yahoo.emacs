@@ -276,85 +276,84 @@
 (defun yf-tok-start (tokens) (cadr (car tokens)))
 (defun yf-tok-end (tokens) (caddr (car tokens)))
 
-(defvar yf-stack nil)
+(defvar-local yf-stack nil
+  "Main stack used by the interpreter.")
+
+(defvar-local yf-dict (make-hash-table :test #'equal)
+  "Dictionary used by the interpreter.")
 
 (defun yf-pop () (pop yf-stack))
 (defun yf-push (item) (push item yf-stack))
 (defun yf-tos () (car yf-stack))
 (defun yf-tos2 () (cadr yf-stack))
+(defun yf-clear () (setq yf-stack '()))
+
+(defun yf-defword (name lambda)
+  (puthash name lambda yf-dict))
 
 (defun yf-eval (text &optional offset)
   "Evaluate TEXT containing postfix expression."
   (interactive)
   (yf-delete-overlays)
-  (let* ((dict (make-hash-table :test #'equal))
-         (tokens (yf-parse text))
+  (let* ((tokens (yf-parse text))
          (index 0)
          (size (length tokens))
          (progress (make-progress-reporter "[yf] Running.. " 0 size))
          (tok-start 0)
          (tok-end 0)
          (tok-offset (or offset 0)))
-    (puthash "+" (lambda () (yf-push (yf-add (yf-pop) (yf-pop)))) dict)
-    (puthash "*" (lambda () (yf-push (yf-mul (yf-pop) (yf-pop)))) dict)
-    (puthash "." (lambda () (yf-print-overlay (yf-to-string (yf-pop)) tok-start tok-end)) dict)
-    (puthash ".s" (lambda () (yf-print-overlay (yf-show-stack yf-stack) tok-start tok-end)) dict)
-    (puthash "message" (lambda () (message (yf-to-string (yf-pop)))) dict)
-    (puthash "?" (lambda () (yf-print-overlay (yf-to-string (yf-tos)) tok-start tok-end)) dict)
-    (puthash "-"
+    (yf-defword "+" (lambda () (yf-push (yf-add (yf-pop) (yf-pop)))))
+    (yf-defword "*" (lambda () (yf-push (yf-mul (yf-pop) (yf-pop)))))
+    (yf-defword "." (lambda () (yf-print-overlay (yf-to-string (yf-pop)) tok-start tok-end)))
+    (yf-defword ".s" (lambda () (yf-print-overlay (yf-show-stack) tok-start tok-end)))
+    (yf-defword "message" (lambda () (message (yf-to-string (yf-pop)))))
+    (yf-defword "?" (lambda () (yf-print-overlay (yf-to-string (yf-tos)) tok-start tok-end)))
+    (yf-defword "-"
              (lambda ()
                (let ((b (yf-pop))
                      (a (yf-pop)))
-                 (yf-push (yf-sub a b))))
-             dict)
-    (puthash "/"
+                 (yf-push (yf-sub a b)))))
+    (yf-defword "/"
              (lambda ()
                (let ((b (yf-pop))
                      (a (yf-pop)))
-                 (yf-push (yf-div a b))))
-             dict)
-    (puthash "sum" (lambda () (setq yf-stack (yf-sum-currency-groups yf-stack))) dict)
-    (puthash "sumprod"
+                 (yf-push (yf-div a b)))))
+    (yf-defword "sum" (lambda () (setq yf-stack (yf-sum-currency-groups yf-stack))))
+    (yf-defword "sumprod"
              (lambda ()
                (setq yf-stack (yf-prod-pairs yf-stack))
-               (setq yf-stack (yf-sum-currency-groups yf-stack)))
-             dict)
-    (puthash "swap"
+               (setq yf-stack (yf-sum-currency-groups yf-stack))))
+    (yf-defword "swap"
              (lambda ()
                (let ((a (yf-pop))
                      (b (yf-pop)))
                  (yf-push a)
-                 (yf-push b)))
-             dict)
-    (puthash "dup" (lambda () (yf-push (yf-tos))) dict)
-    (puthash "over" (lambda () (yf-push (yf-tos2))) dict)
-    (puthash "drop" (lambda () (yf-pop)) dict)
-    (puthash "clear" (lambda () (setq yf-stack '())) dict)
-    (puthash "depth"
+                 (yf-push b))))
+    (yf-defword "dup" (lambda () (yf-push (yf-tos))))
+    (yf-defword "over" (lambda () (yf-push (yf-tos2))))
+    (yf-defword "drop" (lambda () (yf-pop)))
+    (yf-defword "clear" (lambda () (yf-clear)))
+    (yf-defword "depth"
              (lambda () (yf-push (cons (length yf-stack)
-                                    yf-default-currency)))
-             dict)
-    (puthash "to"
+                                    yf-default-currency))))
+    (yf-defword "to"
              (lambda ()
                (let ((currency (yf-tok tokens)))
                  (yf-push (yf-to (yf-pop) currency)))
-               (setq tokens (cdr tokens))) ;; consume next
-             dict) 
-    (puthash "const"
+               (setq tokens (cdr tokens)))) ;; consume next
+    (yf-defword "const"
              (lambda ()
                (let ((name (yf-tok tokens))
                      (val (yf-pop)))
                  (yf-debug-message "Define constant %s with value %s" name val)
-                 (puthash name (lambda () (yf-push val)) dict))
-               (setq tokens (cdr tokens))) ;; consume next
-             dict) 
-    (puthash "("
+                 (yf-defword name (lambda () (yf-push val))))
+               (setq tokens (cdr tokens)))) ;; consume next
+    (yf-defword "("
              (lambda ()
                (while (and tokens
                            (not (string= ")" (yf-tok tokens))))
                  (setq tokens (cdr tokens)))
-               (setq tokens (cdr tokens)))
-             dict)
+               (setq tokens (cdr tokens))))
     (while tokens
       (let* ((tok (yf-tok tokens)))
         (setq tok-start (+ tok-offset (yf-tok-start tokens)))
@@ -362,8 +361,8 @@
         (setq tokens (cdr tokens))
         (yf-debug-message "Eval token: '%s' at: %d-%d" tok tok-start tok-end)
         (cond
-         ((gethash tok dict)
-          (funcall (gethash tok dict)))
+         ((gethash tok yf-dict)
+          (funcall (gethash tok yf-dict)))
          ((yf-is-currency? tok)
           (yf-push (cons (car (yf-pop))
                       (upcase tok))))
@@ -378,10 +377,11 @@
         (progress-reporter-update progress index)
         (setq index (1+ index))
         (sit-for 0)))
-    (progress-reporter-done progress)))
+    (progress-reporter-done progress))
+  yf-stack)
 
-(defun yf-show-stack (stack)
-  (mapconcat #'yf-to-string (reverse stack) " "))
+(defun yf-show-stack ()
+  (mapconcat #'yf-to-string (reverse yf-stack) " "))
 
 (defun yf-eval-current-line ()
   "Read and eval current line by resolving tickers and currency conversions."
@@ -389,13 +389,13 @@
   (let* ((line (thing-at-point 'line t))
          (offset (- (line-beginning-position) 1)))
     (yf-eval line offset)
-    (message (yf-show-stack yf-stack))))
+    (message (yf-show-stack))))
 
 (defun yf-eval-buffer ()
   "Read and eval current buffer by resolving tickers and currency conversions."
   (interactive)
   (yf-eval (buffer-string))
-  (message (yf-show-stack yf-stack)))
+  (message (yf-show-stack)))
 
 (provide 'yf)
 
