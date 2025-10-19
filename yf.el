@@ -295,7 +295,11 @@
 (defun yf-tok-start (tokens) (cadr (car tokens)))
 (defun yf-tok-end (tokens) (caddr (car tokens)))
 
-(defun yf-pop () (pop yf-stack))
+(defun yf-pop ()
+  (unless yf-stack
+    (user-error "[yf] Stack underflow."))
+  (pop yf-stack))
+
 (defun yf-push (item) (push item yf-stack))
 (defun yf-tos () (car yf-stack))
 (defun yf-tos2 () (cadr yf-stack))
