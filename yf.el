@@ -425,10 +425,15 @@
 (defun yf-show-stack ()
   (mapconcat #'yf-to-string (reverse yf-stack) " "))
 
+(defun yf-clean-state ()
+  (yf-delete-overlays)
+  (yf-clear)
+  (yf-forget))
+
 (defun yf-eval-current-line ()
   "Read and eval current line as YF code."
   (interactive)
-  (yf-delete-overlays)
+  (yf-clean-state)
   (let* ((line (thing-at-point 'line t))
          (offset (- (line-beginning-position) 1)))
     (yf-eval line offset)
@@ -437,7 +442,7 @@
 (defun yf-eval-region (start end)
   "Read and eval the region between START and END as YF code."
   (interactive "r")
-  (yf-delete-overlays)
+  (yf-clean-state)
   (let* ((text (buffer-substring-no-properties start end))
          (offset (- start 1)))
     (yf-eval text offset)
@@ -446,7 +451,7 @@
 (defun yf-eval-buffer ()
   "Read and eval current buffer as YF code."
   (interactive)
-  (yf-delete-overlays)
+  (yf-clean-state)
   (yf-eval (buffer-string))
   (message (yf-show-stack)))
 
