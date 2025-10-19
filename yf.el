@@ -61,6 +61,9 @@
 (defvar-local yf-dict (make-hash-table :test #'equal)
   "Dictionary used by the interpreter.")
 
+(defvar-local yf-word-list nil
+  "List of built-in and user defined words")
+
 (defmacro yf-debug-message (fmt &rest args)
   `(when yf-debug
      (let* ((now (format-time-string "%Y-%m-%d %H:%M:%S"))
@@ -239,13 +242,13 @@
   (mapc #'delete-overlay yf-overlays)
   (setq yf-overlays nil))
 
-(defun yf-word-list ()
+(defun yf-refresh-word-list ()
   (let (keys)
     (maphash (lambda (k _v) (push k keys)) yf-dict)
-    keys))
+    (setq-local yf-word-list keys)))
 
 (defun yf-words ()
-  (mapconcat #'identity (nreverse (yf-word-list)) " "))
+  (mapconcat #'identity (reverse yf-word-list) " "))
 
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
@@ -371,7 +374,8 @@
               (let ((name (yf-tok tokens))
                     (val (yf-pop)))
                 (yf-debug-message "Define constant %s with value %s" name val)
-                (yf-def name (lambda () (yf-push val))))
+                (yf-def name (lambda () (yf-push val)))
+                (yf-refresh-word-list))
               (setq tokens (cdr tokens)))) ;; consume next
     (yf-def "words" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))
     (yf-def "("
@@ -380,6 +384,8 @@
                           (not (string= ")" (yf-tok tokens))))
                 (setq tokens (cdr tokens)))
               (setq tokens (cdr tokens))))
+    (unless yf-word-list
+      (yf-refresh-word-list))
     (while tokens
       (setq tok (yf-tok tokens))
       (setq tok-start (+ tok-offset (yf-tok-start tokens)))

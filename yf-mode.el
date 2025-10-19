@@ -19,14 +19,10 @@
     (modify-syntax-entry ?\) ">" st)
     st))
 
-(defvar yf-mode-builtins nil
-  "Yf built-in words for syntax highlight")
-
 (defun yf-mode-builtin-words ()
-  (unless yf-mode-builtins
-    (yf-eval "") ; initialize dictionary
-    (setq yf-mode-builtins (yf-word-list)))
-  yf-mode-builtins)
+  (unless yf-word-list
+    (yf-eval "")) ; initialize dictionary
+  yf-word-list)
 
 (defun yf-mode-completion ()
   (let ((bounds (bounds-of-thing-at-point 'symbol)))
