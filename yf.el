@@ -291,7 +291,7 @@
         (setq pos end)))
     (nreverse tokens)))
 
-(defun yf-tok (tokens) (caar tokens))
+(defun yf-tok (tokens) (upcase (caar tokens)))
 (defun yf-tok-start (tokens) (cadr (car tokens)))
 (defun yf-tok-end (tokens) (caddr (car tokens)))
 
@@ -311,7 +311,7 @@
 
 (defun yf-def (name lambda)
   "Define a new word with NAME and LAMBDA."
-  (puthash name lambda yf-dict))
+  (puthash (upcase name) lambda yf-dict))
 
 (defun yf-eval (text &optional offset)
   "Evaluate TEXT containing postfix expression."
@@ -327,8 +327,8 @@
     (yf-def "+" (lambda () (yf-push (yf-add (yf-pop) (yf-pop)))))
     (yf-def "*" (lambda () (yf-push (yf-mul (yf-pop) (yf-pop)))))
     (yf-def "." (lambda () (yf-print-overlay (yf-to-string (yf-pop)) tok-start tok-end)))
-    (yf-def ".s" (lambda () (yf-print-overlay (yf-show-stack) tok-start tok-end)))
-    (yf-def "message" (lambda () (message (yf-to-string (yf-pop)))))
+    (yf-def ".S" (lambda () (yf-print-overlay (yf-show-stack) tok-start tok-end)))
+    (yf-def "MESSAGE" (lambda () (message (yf-to-string (yf-pop)))))
     (yf-def "?" (lambda () (yf-print-overlay (yf-to-string (yf-tos)) tok-start tok-end)))
     (yf-def "-"
             (lambda ()
@@ -340,18 +340,18 @@
               (let ((b (yf-pop))
                     (a (yf-pop)))
                 (yf-push (yf-div a b)))))
-    (yf-def "sum" (lambda () (setq yf-stack (yf-sum-currency-groups yf-stack))))
-    (yf-def "sumprod"
+    (yf-def "SUM" (lambda () (setq yf-stack (yf-sum-currency-groups yf-stack))))
+    (yf-def "SUMPROD"
             (lambda ()
               (setq yf-stack (yf-prod-pairs yf-stack))
               (setq yf-stack (yf-sum-currency-groups yf-stack))))
-    (yf-def "swap"
+    (yf-def "SWAP"
             (lambda ()
               (let ((a (yf-pop))
                     (b (yf-pop)))
                 (yf-push a)
                 (yf-push b))))
-    (yf-def "rot"
+    (yf-def "ROT"
             (lambda ()
               (let ((a (yf-pop))
                     (b (yf-pop))
@@ -359,7 +359,7 @@
                 (yf-push b)
                 (yf-push a)
                 (yf-push c))))
-    (yf-def "-rot"
+    (yf-def "-ROT"
             (lambda ()
               (let ((a (yf-pop))
                     (b (yf-pop))
@@ -367,23 +367,23 @@
                 (yf-push a)
                 (yf-push c)
                 (yf-push b))))
-    (yf-def "shift"
+    (yf-def "SHIFT"
             (lambda ()
               (let ((tos (yf-pop)))
                 (setq yf-stack (append yf-stack (list tos))))))
-    (yf-def "dup" (lambda () (yf-push (yf-tos))))
-    (yf-def "over" (lambda () (yf-push (yf-tos2))))
-    (yf-def "drop" #'yf-pop)
-    (yf-def "clear" #'yf-clear)
-    (yf-def "depth"
+    (yf-def "DUP" (lambda () (yf-push (yf-tos))))
+    (yf-def "OVER" (lambda () (yf-push (yf-tos2))))
+    (yf-def "DROP" #'yf-pop)
+    (yf-def "CLEAR" #'yf-clear)
+    (yf-def "DEPTH"
             (lambda () (yf-push (cons (length yf-stack)
                                       yf-default-currency))))
-    (yf-def "to"
+    (yf-def "TO"
             (lambda ()
               (let ((currency (yf-tok tokens)))
                 (yf-push (yf-to (yf-pop) currency)))
               (setq tokens (cdr tokens)))) ;; consume next
-    (yf-def "const"
+    (yf-def "CONST"
             (lambda ()
               (let ((name (yf-tok tokens))
                     (val (yf-pop)))
@@ -391,7 +391,7 @@
                 (yf-def name (lambda () (yf-push val)))
                 (yf-refresh-word-list))
               (setq tokens (cdr tokens)))) ;; consume next
-    (yf-def "words" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))
+    (yf-def "WORDS" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))
     (yf-def "("
             (lambda ()
               (while (and tokens
