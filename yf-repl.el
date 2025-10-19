@@ -36,6 +36,7 @@
 (define-derived-mode yf-repl-mode comint-mode "YF-REPL"
   :syntax-table yf-mode-syntax-table
   (setq-local font-lock-defaults `(,yf-font-lock-defaults))
+  (setq-local completion-at-point-functions '(yf-mode-completion t))
   (setq-local comment-start "(")
   (setq-local comment-end ")")
   (setq-local comint-prompt-regexp (concat "^" (regexp-quote yf-repl-prompt)))
@@ -74,7 +75,6 @@
     (when buf (kill-buffer buf))
     (yf-repl-start)))
 
-(add-to-list 'completion-at-point-functions 'yf-mode-completion)
 (add-hook 'kill-emacs-hook #'yf-repl-save-history)
 
 (provide 'yf-repl)

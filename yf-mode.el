@@ -25,7 +25,8 @@
 (defun yf-mode-builtin-words ()
   (unless yf-mode-builtins
     (yf-eval "") ; initialize dictionary
-    (setq yf-mode-builtins (yf-word-list))))
+    (setq yf-mode-builtins (yf-word-list)))
+  yf-mode-builtins)
 
 (defun yf-mode-completion ()
   (let ((bounds (bounds-of-thing-at-point 'symbol)))
@@ -45,10 +46,10 @@
   "Major mode for .yf files."
   :syntax-table yf-mode-syntax-table
   (setq-local font-lock-defaults `(,yf-font-lock-defaults))
+  (setq-local completion-at-point-functions '(yf-mode-completion t))
   (setq-local comment-start "(")
   (setq-local comment-end ")"))
 
-(add-to-list 'completion-at-point-functions 'yf-mode-completion)
 
 (provide 'yf-mode)
 
