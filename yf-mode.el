@@ -19,23 +19,26 @@
     (modify-syntax-entry ?\) ">" st)
     st))
 
-(defvar yf-builtin-words
-  '("to" "clear" "depth" "dup" "swap" "over"
-    "const" "sum" "sumprod" "message"))
+;(add-to-list 'completion-at-point-functions 'lispy-python-completion-at-point)
 
-(defvar yf-builtin-symbols
-  '("+" "-" "*" "/" "?" "." ".s"))
+(defvar yf-mode-builtins nil
+  "Yf built-in words for syntax highlight")
+
+(defun yf-mode-builtin-words ()
+  (unless yf-mode-builtins
+    (yf-eval "") ; initialize dictionary
+    (setq yf-mode-builtins (yf-word-list))))
 
 (defvar yf-font-lock-defaults
   `((,(regexp-opt yf-currency-codes 'words) . font-lock-keyword-face)
-    (,(regexp-opt yf-builtin-words 'words) . font-lock-builtin-face)
     (,(concat "\\<" yf-ticker-regexp "\\>") . font-lock-type-face)
     ("\\<-?[0-9]+\\(\\.[0-9]+\\)?\\>" . font-lock-constant-face)
-    (,(regexp-opt yf-builtin-symbols) . font-lock-builtin-face)))
+    (,(regexp-opt (yf-mode-builtin-words)) . font-lock-builtin-face)))
 
 (define-derived-mode yf-mode prog-mode "YF"
   "Major mode for .yf files."
   :syntax-table yf-mode-syntax-table
+  (yf-eval "") ;; initialize dictionary
   (setq-local font-lock-defaults `(,yf-font-lock-defaults))
   (setq-local comment-start "(")
   (setq-local comment-end ")"))

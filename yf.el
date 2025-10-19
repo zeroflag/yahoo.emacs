@@ -239,10 +239,13 @@
   (mapc #'delete-overlay yf-overlays)
   (setq yf-overlays nil))
 
-(defun yf-words ()
+(defun yf-word-list ()
   (let (keys)
     (maphash (lambda (k _v) (push k keys)) yf-dict)
-    (mapconcat #'identity (nreverse keys) " ")))
+    keys))
+
+(defun yf-words ()
+  (mapconcat #'identity (nreverse (yf-word-list)) " "))
 
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
