@@ -288,7 +288,8 @@
 (defun yf-tos2 () (cadr yf-stack))
 (defun yf-clear () (setq yf-stack '()))
 
-(defun yf-defword (name lambda)
+(defun yf-def (name lambda)
+  "Define a new word with NAME and LAMBDA."
   (puthash name lambda yf-dict))
 
 (defun yf-eval (text &optional offset)
@@ -296,87 +297,88 @@
   (interactive)
   (yf-delete-overlays)
   (let* ((tokens (yf-parse text))
+         (tok nil)
          (index 0)
          (size (length tokens))
          (progress (make-progress-reporter "[yf] Running.. " 0 size))
          (tok-start 0)
          (tok-end 0)
          (tok-offset (or offset 0)))
-    (yf-defword "+" (lambda () (yf-push (yf-add (yf-pop) (yf-pop)))))
-    (yf-defword "*" (lambda () (yf-push (yf-mul (yf-pop) (yf-pop)))))
-    (yf-defword "." (lambda () (yf-print-overlay (yf-to-string (yf-pop)) tok-start tok-end)))
-    (yf-defword ".s" (lambda () (yf-print-overlay (yf-show-stack) tok-start tok-end)))
-    (yf-defword "message" (lambda () (message (yf-to-string (yf-pop)))))
-    (yf-defword "?" (lambda () (yf-print-overlay (yf-to-string (yf-tos)) tok-start tok-end)))
-    (yf-defword "-"
-             (lambda ()
-               (let ((b (yf-pop))
-                     (a (yf-pop)))
-                 (yf-push (yf-sub a b)))))
-    (yf-defword "/"
-             (lambda ()
-               (let ((b (yf-pop))
-                     (a (yf-pop)))
-                 (yf-push (yf-div a b)))))
-    (yf-defword "sum" (lambda () (setq yf-stack (yf-sum-currency-groups yf-stack))))
-    (yf-defword "sumprod"
-             (lambda ()
-               (setq yf-stack (yf-prod-pairs yf-stack))
-               (setq yf-stack (yf-sum-currency-groups yf-stack))))
-    (yf-defword "swap"
-             (lambda ()
-               (let ((a (yf-pop))
-                     (b (yf-pop)))
-                 (yf-push a)
-                 (yf-push b))))
-    (yf-defword "dup" (lambda () (yf-push (yf-tos))))
-    (yf-defword "over" (lambda () (yf-push (yf-tos2))))
-    (yf-defword "drop" #'yf-pop)
-    (yf-defword "clear" #'yf-clear)
-    (yf-defword "depth"
-             (lambda () (yf-push (cons (length yf-stack)
-                                    yf-default-currency))))
-    (yf-defword "to"
-             (lambda ()
-               (let ((currency (yf-tok tokens)))
-                 (yf-push (yf-to (yf-pop) currency)))
-               (setq tokens (cdr tokens)))) ;; consume next
-    (yf-defword "const"
-             (lambda ()
-               (let ((name (yf-tok tokens))
-                     (val (yf-pop)))
-                 (yf-debug-message "Define constant %s with value %s" name val)
-                 (yf-defword name (lambda () (yf-push val))))
-               (setq tokens (cdr tokens)))) ;; consume next
-    (yf-defword "("
-             (lambda ()
-               (while (and tokens
-                           (not (string= ")" (yf-tok tokens))))
-                 (setq tokens (cdr tokens)))
-               (setq tokens (cdr tokens))))
+    (yf-def "+" (lambda () (yf-push (yf-add (yf-pop) (yf-pop)))))
+    (yf-def "*" (lambda () (yf-push (yf-mul (yf-pop) (yf-pop)))))
+    (yf-def "." (lambda () (yf-print-overlay (yf-to-string (yf-pop)) tok-start tok-end)))
+    (yf-def ".s" (lambda () (yf-print-overlay (yf-show-stack) tok-start tok-end)))
+    (yf-def "message" (lambda () (message (yf-to-string (yf-pop)))))
+    (yf-def "?" (lambda () (yf-print-overlay (yf-to-string (yf-tos)) tok-start tok-end)))
+    (yf-def "-"
+            (lambda ()
+              (let ((b (yf-pop))
+                    (a (yf-pop)))
+                (yf-push (yf-sub a b)))))
+    (yf-def "/"
+            (lambda ()
+              (let ((b (yf-pop))
+                    (a (yf-pop)))
+                (yf-push (yf-div a b)))))
+    (yf-def "sum" (lambda () (setq yf-stack (yf-sum-currency-groups yf-stack))))
+    (yf-def "sumprod"
+            (lambda ()
+              (setq yf-stack (yf-prod-pairs yf-stack))
+              (setq yf-stack (yf-sum-currency-groups yf-stack))))
+    (yf-def "swap"
+            (lambda ()
+              (let ((a (yf-pop))
+                    (b (yf-pop)))
+                (yf-push a)
+                (yf-push b))))
+    (yf-def "dup" (lambda () (yf-push (yf-tos))))
+    (yf-def "over" (lambda () (yf-push (yf-tos2))))
+    (yf-def "drop" #'yf-pop)
+    (yf-def "clear" #'yf-clear)
+    (yf-def "depth"
+            (lambda () (yf-push (cons (length yf-stack)
+                                      yf-default-currency))))
+    (yf-def "to"
+            (lambda ()
+              (let ((currency (yf-tok tokens)))
+                (yf-push (yf-to (yf-pop) currency)))
+              (setq tokens (cdr tokens)))) ;; consume next
+    (yf-def "const"
+            (lambda ()
+              (let ((name (yf-tok tokens))
+                    (val (yf-pop)))
+                (yf-debug-message "Define constant %s with value %s" name val)
+                (yf-def name (lambda () (yf-push val))))
+              (setq tokens (cdr tokens)))) ;; consume next
+    (yf-def "("
+            (lambda ()
+              (while (and tokens
+                          (not (string= ")" (yf-tok tokens))))
+                (setq tokens (cdr tokens)))
+              (setq tokens (cdr tokens))))
     (while tokens
-      (let* ((tok (yf-tok tokens)))
-        (setq tok-start (+ tok-offset (yf-tok-start tokens)))
-        (setq tok-end (+ tok-offset (yf-tok-end tokens)))
-        (setq tokens (cdr tokens))
-        (yf-debug-message "Eval token: '%s' at: %d-%d" tok tok-start tok-end)
-        (cond
-         ((gethash tok yf-dict)
-          (funcall (gethash tok yf-dict)))
-         ((yf-is-currency? tok)
-          (yf-push (cons (car (yf-pop))
-                      (upcase tok))))
-         ((yf-num? tok)
-          (yf-push (cons (string-to-number tok)
-                      yf-default-currency)))
-         ((yf-ticker? tok)
-          (yf-push (yf-resolve-ticker tok)))
-         (t
-          (user-error
-           "Unkown word: %s at: %d-%d" tok tok-start tok-end)))
-        (progress-reporter-update progress index)
-        (setq index (1+ index))
-        (sit-for 0)))
+      (setq tok (yf-tok tokens))
+      (setq tok-start (+ tok-offset (yf-tok-start tokens)))
+      (setq tok-end (+ tok-offset (yf-tok-end tokens)))
+      (setq tokens (cdr tokens))
+      (yf-debug-message "Eval token: '%s' at: %d-%d" tok tok-start tok-end)
+      (cond
+       ((gethash tok yf-dict)
+        (funcall (gethash tok yf-dict)))
+       ((yf-is-currency? tok)
+        (yf-push (cons (car (yf-pop))
+                       (upcase tok))))
+       ((yf-num? tok)
+        (yf-push (cons (string-to-number tok)
+                       yf-default-currency)))
+       ((yf-ticker? tok)
+        (yf-push (yf-resolve-ticker tok)))
+       (t
+        (user-error
+         "Unkown word: %s at: %d-%d" tok tok-start tok-end)))
+      (progress-reporter-update progress index)
+      (setq index (1+ index))
+      (sit-for 0))
     (progress-reporter-done progress))
   yf-stack)
 
