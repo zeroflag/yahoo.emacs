@@ -27,10 +27,11 @@
 (defun yf-mode-completion ()
   (let ((bounds (bounds-of-thing-at-point 'symbol)))
     (when bounds
-      (let ((start (car bounds))
-            (end (cdr bounds))
-            (candidates (yf-mode-builtin-words)))
-        (list start end candidates)))))
+      (let* ((start (car bounds))
+             (end (cdr bounds))
+             (words (yf-mode-builtin-words))
+             (all (append words yf-currency-codes)))
+        (list start end all)))))
 
 (defvar yf-font-lock-defaults
   `((,(regexp-opt yf-currency-codes 'words) . font-lock-keyword-face)
