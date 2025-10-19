@@ -55,10 +55,12 @@
 (dolist (code yf-currency-codes)
   (puthash code t yf-currency-set))
 
+(defun yf-new-dict () (make-hash-table :test #'equal))
+
 (defvar-local yf-stack nil
   "Main stack used by the interpreter.")
 
-(defvar-local yf-dict (make-hash-table :test #'equal)
+(defvar-local yf-dict (yf-new-dict)
   "Dictionary used by the interpreter.")
 
 (defvar-local yf-word-list nil
@@ -298,7 +300,10 @@
 (defun yf-tos () (car yf-stack))
 (defun yf-tos2 () (cadr yf-stack))
 (defun yf-clear () (setq yf-stack '()))
-(defun yf-forget () (setq yf-dict '()))
+
+(defun yf-forget ()
+  (setq yf-word-list '())
+  (setq yf-dict (yf-new-dict)))
 
 (defun yf-def (name lambda)
   "Define a new word with NAME and LAMBDA."
