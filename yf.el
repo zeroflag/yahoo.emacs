@@ -426,7 +426,7 @@
   (mapconcat #'yf-to-string (reverse yf-stack) " "))
 
 (defun yf-eval-current-line ()
-  "Read and eval current line by resolving tickers and currency conversions."
+  "Read and eval current line as YF code."
   (interactive)
   (yf-delete-overlays)
   (let* ((line (thing-at-point 'line t))
@@ -434,8 +434,17 @@
     (yf-eval line offset)
     (message (yf-show-stack))))
 
+(defun yf-eval-region (start end)
+  "Read and eval the region between START and END as YF code."
+  (interactive "r")
+  (yf-delete-overlays)
+  (let* ((text (buffer-substring-no-properties start end))
+         (offset (- start 1)))
+    (yf-eval text offset)
+    (message (yf-show-stack))))
+
 (defun yf-eval-buffer ()
-  "Read and eval current buffer by resolving tickers and currency conversions."
+  "Read and eval current buffer as YF code."
   (interactive)
   (yf-delete-overlays)
   (yf-eval (buffer-string))
