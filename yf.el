@@ -55,6 +55,12 @@
 (dolist (code yf-currency-codes)
   (puthash code t yf-currency-set))
 
+(defvar-local yf-stack nil
+  "Main stack used by the interpreter.")
+
+(defvar-local yf-dict (make-hash-table :test #'equal)
+  "Dictionary used by the interpreter.")
+
 (defmacro yf-debug-message (fmt &rest args)
   `(when yf-debug
      (let* ((now (format-time-string "%Y-%m-%d %H:%M:%S"))
@@ -223,15 +229,20 @@
     (push overlay yf-overlays)
     (overlay-put overlay
                  'after-string
-                 (propertize
-                  (concat " => " text)
-                  'face `(:foreground ,yf-overlay-color)))))
+                 (concat
+                  (propertize " => " 'face `(:foreground "brow"))
+                  (propertize text 'face `(:foreground ,yf-overlay-color))))))
 
 (defun yf-delete-overlays ()
   "Delete all overlays created by YF."
   (interactive)
   (mapc #'delete-overlay yf-overlays)
   (setq yf-overlays nil))
+
+(defun yf-words ()
+  (let (keys)
+    (maphash (lambda (k _v) (push k keys)) yf-dict)
+    (mapconcat #'identity (nreverse keys) " ")))
 
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
@@ -275,12 +286,6 @@
 (defun yf-tok (tokens) (caar tokens))
 (defun yf-tok-start (tokens) (cadr (car tokens)))
 (defun yf-tok-end (tokens) (caddr (car tokens)))
-
-(defvar-local yf-stack nil
-  "Main stack used by the interpreter.")
-
-(defvar-local yf-dict (make-hash-table :test #'equal)
-  "Dictionary used by the interpreter.")
 
 (defun yf-pop () (pop yf-stack))
 (defun yf-push (item) (push item yf-stack))
@@ -366,6 +371,7 @@
                 (yf-debug-message "Define constant %s with value %s" name val)
                 (yf-def name (lambda () (yf-push val))))
               (setq tokens (cdr tokens)))) ;; consume next
+    (yf-def "words" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))
     (yf-def "("
             (lambda ()
               (while (and tokens
