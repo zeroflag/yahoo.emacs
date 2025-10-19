@@ -33,6 +33,9 @@
              (all (append words yf-currency-codes)))
         (list start end all)))))
 
+(defvar yf-builtin-symbols
+  '("+" "-" "*" "/" "?" "." ".s"))
+
 (defvar yf-font-lock-defaults
   `((,(regexp-opt yf-currency-codes 'words) . font-lock-keyword-face)
     (,(concat "\\<" yf-ticker-regexp "\\>") . font-lock-type-face)
@@ -40,7 +43,8 @@
     (,(regexp-opt
        (mapcar #'upcase (yf-mode-builtin-words)) 'words) . font-lock-builtin-face)
     (,(regexp-opt
-       (mapcar #'downcase (yf-mode-builtin-words)) 'words) . font-lock-builtin-face)))
+       (mapcar #'downcase (yf-mode-builtin-words)) 'words) . font-lock-builtin-face)
+    (,(regexp-opt yf-builtin-symbols) . font-lock-builtin-face)))
 
 (define-derived-mode yf-mode prog-mode "YF"
   "Major mode for .yf files."
