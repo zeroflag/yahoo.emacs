@@ -331,8 +331,8 @@
                  (yf-push b))))
     (yf-defword "dup" (lambda () (yf-push (yf-tos))))
     (yf-defword "over" (lambda () (yf-push (yf-tos2))))
-    (yf-defword "drop" (lambda () (yf-pop)))
-    (yf-defword "clear" (lambda () (yf-clear)))
+    (yf-defword "drop" #'yf-pop)
+    (yf-defword "clear" #'yf-clear)
     (yf-defword "depth"
              (lambda () (yf-push (cons (length yf-stack)
                                     yf-default-currency))))
