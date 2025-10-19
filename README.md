@@ -22,11 +22,14 @@
              yf-delete-overlays)
   :init
   (map! :leader
-        :desc "Eval line as Yahoo Finance postfix expression."
+        :desc "Eval line as yf code."
         "y e" #'yf-eval-current-line)
   (map! :leader
-        :desc "Eval buffer as Yahoo Finance postfix expression."
+        :desc "Eval buffer as yf code."
         "y b" #'yf-eval-buffer)
+  (map! :leader
+        :desc "Eval region as yf code."
+        "y r" #'yf-eval-region)
   (map! :leader
         :desc "Delete all overlays created by yf."
         "y d" #'yf-delete-overlays))
