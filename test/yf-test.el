@@ -55,6 +55,10 @@
                  '((4 . "ANY"))))
   (should (equal (eval1 "1 2 over")
                  '((1 . "ANY") (2 . "ANY") (1 . "ANY"))))
+  (should (equal (eval1 "1 2 3 rot")
+                 '((1 . "ANY") (3 . "ANY") (2 . "ANY"))))
+  (should (equal (eval1 "1 2 3 -rot")
+                 '((2 . "ANY") (1 . "ANY") (3 . "ANY"))))
   (should (equal (eval1 "3 drop") nil)))
 
 (ert-deftest yf-depth-test ()
