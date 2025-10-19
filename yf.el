@@ -50,17 +50,17 @@
     "VUV" "WST" "XAF" "XCD" "XDR" "XOF" "XPF" "YER" "ZAR" "ZMW"
     "ZWL" ,yf-default-currency))
 
-(defconst yf-currency-set (make-hash-table :test 'equal))
+(defun yf-new-ht () (make-hash-table :test #'equal))
+
+(defconst yf-currency-set (yf-new-ht))
 
 (dolist (code yf-currency-codes)
   (puthash code t yf-currency-set))
 
-(defun yf-new-dict () (make-hash-table :test #'equal))
-
 (defvar-local yf-stack nil
   "Main stack used by the interpreter.")
 
-(defvar-local yf-dict (yf-new-dict)
+(defvar-local yf-dict (yf-new-ht)
   "Dictionary used by the interpreter.")
 
 (defvar-local yf-word-list nil
@@ -303,7 +303,7 @@
 
 (defun yf-forget ()
   (setq yf-word-list '())
-  (setq yf-dict (yf-new-dict)))
+  (setq yf-dict (yf-new-ht)))
 
 (defun yf-def (name lambda)
   "Define a new word with NAME and LAMBDA."

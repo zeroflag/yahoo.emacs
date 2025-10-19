@@ -36,7 +36,7 @@
   `((,(regexp-opt yf-currency-codes 'words) . font-lock-keyword-face)
     (,(concat "\\<" yf-ticker-regexp "\\>") . font-lock-type-face)
     ("\\<-?[0-9]+\\(\\.[0-9]+\\)?\\>" . font-lock-constant-face)
-    (,(regexp-opt (yf-mode-builtin-words)) . font-lock-builtin-face)))
+    (,(regexp-opt (yf-mode-builtin-words) 'words) . font-lock-builtin-face)))
 
 (define-derived-mode yf-mode prog-mode "YF"
   "Major mode for .yf files."
