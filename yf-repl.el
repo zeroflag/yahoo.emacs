@@ -74,6 +74,7 @@
     (when buf (kill-buffer buf))
     (yf-repl-start)))
 
+(add-to-list 'completion-at-point-functions 'yf-mode-completion)
 (add-hook 'kill-emacs-hook #'yf-repl-save-history)
 
 (provide 'yf-repl)
