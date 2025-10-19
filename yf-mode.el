@@ -33,7 +33,7 @@
              (all (append words yf-currency-codes)))
         (list start end all)))))
 
-(defvar yf-builtin-symbols
+(defconst yf-builtin-symbols
   '("+" "-" "*" "/" "?" "." ".s"))
 
 (defvar yf-font-lock-defaults
