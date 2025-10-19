@@ -411,8 +411,8 @@
               (yf-push nil)))
     (yf-def "TIMES"
             (lambda ()
-              (let ((count (car (yf-pop)))
-                    (code (yf-join (yf-pop))))
+              (let ((code (yf-join (yf-pop)))
+                    (count (car (yf-pop))))
                 (dotimes (_ count)
                   (yf-eval code)))))
     (yf-def "WORDS" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))

@@ -110,4 +110,4 @@
   (should (equal (eval1 "x y +") '((579 . "ANY")))))
 
 (ert-deftest yf-quotation-test ()
-  (should (equal (eval1 "1 [ 2 * ] 10 TIMES") '((1024 . "ANY")))))
+  (should (equal (eval1 "1 10 [ 2 * ] TIMES") '((1024 . "ANY")))))
