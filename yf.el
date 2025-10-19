@@ -300,7 +300,6 @@
 (defun yf-eval (text &optional offset)
   "Evaluate TEXT containing postfix expression."
   (interactive)
-  (yf-delete-overlays)
   (let* ((tokens (yf-parse text))
          (tok nil)
          (index 0)
@@ -410,6 +409,7 @@
 (defun yf-eval-current-line ()
   "Read and eval current line by resolving tickers and currency conversions."
   (interactive)
+  (yf-delete-overlays)
   (let* ((line (thing-at-point 'line t))
          (offset (- (line-beginning-position) 1)))
     (yf-eval line offset)
@@ -418,6 +418,7 @@
 (defun yf-eval-buffer ()
   "Read and eval current buffer by resolving tickers and currency conversions."
   (interactive)
+  (yf-delete-overlays)
   (yf-eval (buffer-string))
   (message (yf-show-stack)))
 
