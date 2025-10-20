@@ -157,7 +157,7 @@
                        ""
                      currency)))
       (concat prefix " " suffix)))
-   (t ; assume quoitation
+   (t ; assume quotation
     (concat "[ "
             (substring (format "%s" (reverse item)) 1 -1)
             " ]"))))
@@ -210,7 +210,13 @@
         (c2 (cdr b)))
     (if (yf-is-default-currency? c1) c2 c1)))
 
+(defun yf-expect-money (xs)
+  (dolist (x xs)
+    (unless (yf-money? x)
+      (user-error "TypeError: expected money, got %s" x))))
+
 (defun yf-add (a b)
+  (yf-expect-money (list a b))
   (let ((n1 (car a))
         (n2 (car b)))
     (yf-check-currency a b)
@@ -218,6 +224,7 @@
           (yf-pick-currency a b))))
 
 (defun yf-sub (a b)
+  (yf-expect-money (list a b))
   (let ((n1 (car a))
         (n2 (car b)))
     (yf-check-currency a b)
@@ -225,6 +232,7 @@
           (yf-pick-currency a b))))
 
 (defun yf-mul (a b)
+  (yf-expect-money (list a b))
   (let ((n1 (car a))
         (n2 (car b)))
     (yf-check-currency a b)
@@ -232,6 +240,7 @@
           (yf-pick-currency a b))))
 
 (defun yf-div (a b)
+  (yf-expect-money (list a b))
   (let ((n1 (car a))
         (n2 (car b)))
     (yf-check-currency a b)
@@ -276,12 +285,12 @@
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
 
-(defun yf-to (num-with-currency dst-currency)
+(defun yf-to (money dst-currency)
   (unless (yf-is-currency? dst-currency)
     (user-error "Not a valid currency %s" dst-currency))
-  (let* ((amount (car num-with-currency))
+  (let* ((amount (car money))
          (dst-currency (upcase dst-currency))
-         (src-currency (cdr num-with-currency)))
+         (src-currency (cdr money)))
     (unless (yf-is-currency? src-currency)
       (user-error "Not a valid currency %s" src-currency))
     (cond
