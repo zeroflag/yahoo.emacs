@@ -69,7 +69,7 @@
 (defvar-local yf-mode 'interpret
   "Mode of the interpreter")
 
-(defvar-local yf-nested-quotation-cnt 0)
+(defvar-local yf-quotation-cnt 0)
 
 (defmacro yf-debug-message (fmt &rest args)
   `(when yf-debug
@@ -143,11 +143,22 @@
                  (match-string 2 num))))
     num))
 
-(defun yf-to-string (price)
-  (concat (yf-add-number-grouping (car price)) " "
-          (if (yf-is-default-currency? (cdr price))
-              ""
-            (cdr price))))
+(defun yf-money? (pair)
+  (and (numberp (car pair))
+       (stringp (cdr pair))))
+
+(defun yf-to-string (item)
+  (cond
+   ((yf-money? item)
+    (let* ((amount (car item))
+           (currency (cdr item))
+           (prefix (yf-add-number-grouping amount))
+           (suffix (if (yf-is-default-currency? currency)
+                       ""
+                     currency)))
+      (concat prefix " " suffix)))
+   (t
+    (format "%s" item))))
 
 ;; Exchange rates
 
@@ -324,17 +335,21 @@
 (defun yf-add-to-quotation (tok)
   (yf-push (cons tok (yf-pop))))
 
-(defun yf-eval-quotation (tok)
+(defun yf-eval-quotation (tok start end)
   (cond
    ((string= "]" tok)
-    (setq yf-nested-quotation-cnt (1- yf-nested-quotation-cnt))
-    (if (= 0 yf-nested-quotation-cnt)
+    (when (< yf-quotation-cnt 1)
+      (user-error "Unexpected end of quotation '%s' at: %d-%d"
+                  tok start end))
+    (setq yf-quotation-cnt (1- yf-quotation-cnt))
+    (if (= 0 yf-quotation-cnt)
         (setq yf-mode 'interpret)
       (yf-add-to-quotation tok)))
    ((string= "[" tok)
-    (setq yf-nested-quotation-cnt (1+ yf-nested-quotation-cnt))
+    ; nested quotation
+    (setq yf-quotation-cnt (1+ yf-quotation-cnt))
     (yf-add-to-quotation tok))
-   (t
+   (t ; normal token
     (yf-add-to-quotation tok))))
 
 (defun yf-eval (text &optional offset)
@@ -425,7 +440,7 @@
     (yf-def "["
             (lambda ()
               (setq yf-mode 'quotation)
-              (setq yf-nested-quotation-cnt 1)
+              (setq yf-quotation-cnt 1)
               (yf-push nil))) ; list to collect quotation items
     (yf-def "TIMES"
             (lambda ()
@@ -450,7 +465,7 @@
       (yf-debug-message "Eval token: '%s' at: %d-%d" tok tok-start tok-end)
       (cond
        ((eq 'quotation yf-mode)
-        (yf-eval-quotation tok))
+        (yf-eval-quotation tok tok-start tok-end))
        ((gethash tok yf-dict)
         (funcall (gethash tok yf-dict)))
        ((yf-is-currency? tok)
