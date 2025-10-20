@@ -157,8 +157,10 @@
                        ""
                      currency)))
       (concat prefix " " suffix)))
-   (t
-    (format "%s" item))))
+   (t ; assume quoitation
+    (concat "[ "
+            (substring (format "%s" (reverse item)) 1 -1)
+            " ]"))))
 
 ;; Exchange rates
 
