@@ -149,6 +149,8 @@
 
 (defun yf-to-string (item)
   (cond
+   ((null item)
+    "[ ]")
    ((yf-money? item)
     (let* ((amount (car item))
            (currency (cdr item))
@@ -157,7 +159,7 @@
                        ""
                      currency)))
       (concat prefix " " suffix)))
-   (t ; assume quotation
+   ((listp item) ; quotation
     (concat "[ "
             (substring (format "%s" (reverse item)) 1 -1)
             " ]"))))
@@ -213,7 +215,8 @@
 (defun yf-expect-money (xs)
   (dolist (x xs)
     (unless (yf-money? x)
-      (user-error "TypeError: expected money, got %s" x))))
+      (user-error "TypeError: expected money, got %s"
+                  (yf-to-string x)))))
 
 (defun yf-add (a b)
   (yf-expect-money (list a b))
