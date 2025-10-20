@@ -151,6 +151,8 @@
   (cond
    ((null item)
     "[ ]")
+   ((eq item t)
+    "TRUE")
    ((yf-money? item)
     (let* ((amount (car item))
            (currency (cdr item))
@@ -162,7 +164,9 @@
    ((listp item) ; quotation
     (concat "[ "
             (substring (format "%s" (reverse item)) 1 -1)
-            " ]"))))
+            " ]"))
+   (t
+    (format "%s" item))))
 
 ;; Exchange rates
 
@@ -257,6 +261,13 @@
           (second (cadr xs)))
       (cons (yf-mul first second)
             (yf-prod-pairs (cddr xs))))))
+
+(defun yf-lt (a b)
+  (yf-expect-money (list a b))
+  (let ((n1 (car a))
+        (n2 (car b)))
+    (yf-check-currency a b)
+    (< n1 n2)))
 
 (defun yf-print-overlay (text tok-start tok-end)
   (let ((overlay (make-overlay (1+ tok-start)
@@ -393,6 +404,7 @@
               (let ((b (yf-pop))
                     (a (yf-pop)))
                 (yf-push (yf-div a b)))))
+    (yf-def "<" (lambda () (yf-push (yf-lt (yf-pop) (yf-pop)))))
     (yf-def "SUM" (lambda () (setq yf-stack (yf-sum-currency-groups yf-stack))))
     (yf-def "SUMPROD"
             (lambda ()
