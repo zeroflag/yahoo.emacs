@@ -59,6 +59,8 @@
                  '((1 . "ANY") (3 . "ANY") (2 . "ANY"))))
   (should (equal (eval1 "1 2 3 -rot")
                  '((2 . "ANY") (1 . "ANY") (3 . "ANY"))))
+  (should (equal (eval1 "1 2 tuck")
+                 '((2 . "ANY") (1 . "ANY") (2 . "ANY"))))
   (should (equal (eval1 "1 2 3 4 5 shift ")
                  '((4 . "ANY") (3 . "ANY") (2 . "ANY") (1 . "ANY") (5 . "ANY"))))
   (should (equal (eval1 "1 2 3 4 5 shift shift shift shift shift")
@@ -110,4 +112,5 @@
   (should (equal (eval1 "x y +") '((579 . "ANY")))))
 
 (ert-deftest yf-quotation-test ()
-  (should (equal (eval1 "1 [ 2 * ] 10 TIMES") '((1024 . "ANY")))))
+  (should (equal (eval1 "1 [ 2 * ] 10 TIMES") '((1024 . "ANY"))))
+  (should (equal (eval1 "1 [ 2 * [ 1 + ] 3 TIMES ] 2 TIMES") '((13 . "ANY")))))

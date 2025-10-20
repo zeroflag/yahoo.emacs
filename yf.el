@@ -321,10 +321,21 @@
   "Define a new word with NAME and LAMBDA."
   (puthash (upcase name) lambda yf-dict))
 
+(defun yf-add-to-quotation (tok)
+  (yf-push (cons tok (yf-pop))))
+
 (defun yf-eval-quotation (tok)
-  (if (string= "]" tok) ;; TODO handle nesting
-      (setq yf-mode 'interpret)
-    (yf-push (cons tok (yf-pop)))))
+  (cond
+   ((string= "]" tok)
+    (setq yf-nested-quotation-cnt (1- yf-nested-quotation-cnt))
+    (if (= 0 yf-nested-quotation-cnt)
+        (setq yf-mode 'interpret)
+      (yf-add-to-quotation tok)))
+   ((string= "[" tok)
+    (setq yf-nested-quotation-cnt (1+ yf-nested-quotation-cnt))
+    (yf-add-to-quotation tok))
+   (t
+    (yf-add-to-quotation tok))))
 
 (defun yf-eval (text &optional offset)
   "Evaluate TEXT containing postfix expression."
@@ -380,6 +391,13 @@
                 (yf-push a)
                 (yf-push c)
                 (yf-push b))))
+    (yf-def "TUCK"
+            (lambda ()
+              (let ((a (yf-pop))
+                    (b (yf-pop)))
+                (yf-push a)
+                (yf-push b)
+                (yf-push a))))
     (yf-def "SHIFT"
             (lambda ()
               (let ((tos (yf-pop)))
@@ -407,8 +425,8 @@
     (yf-def "["
             (lambda ()
               (setq yf-mode 'quotation)
-              (setq yf-nested-quotation-cnt (1+ yf-nested-quotation-cnt))
-              (yf-push nil)))
+              (setq yf-nested-quotation-cnt 1)
+              (yf-push nil))) ; list to collect quotation items
     (yf-def "TIMES"
             (lambda ()
               (let ((count (car (yf-pop)))
