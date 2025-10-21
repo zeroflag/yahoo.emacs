@@ -148,7 +148,7 @@
   (should (equal (eval1 "100 [ 10 5 < ] [ 2 / ] UNLESS") '((50.0 . "ANY")))))
 
 (ert-deftest yf-if-test ()
-  (should (equal (eval1 "[ 2 ] [ 10 ] [ 4 5 < ] IF") '((10 . "ANY"))))
-  (should (equal (eval1 "3 [ DROP ] [ DUP * ] [ 1 2 < ] IF") '((9 . "ANY"))))
-  (should (equal (eval1 "[ 2 ] [ 10 ] [ 4 5 > ] IF") '((2 . "ANY")))))
+  (should (equal (eval1 "[ 4 5 < ] [ 2 ] [ 10 ] IF") '((10 . "ANY"))))
+  (should (equal (eval1 "3 [ 1 2 < ] [ DROP ] [ DUP * ] IF") '((9 . "ANY"))))
+  (should (equal (eval1 "[ 4 5 > ] [ 2 ] [ 10 ] IF") '((2 . "ANY")))))
 
