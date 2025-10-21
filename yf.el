@@ -70,6 +70,8 @@
   "Mode of the interpreter")
 
 (defvar-local yf-quotation-cnt 0)
+(defvar-local yf-tok-start 0)
+(defvar-local yf-tok-end 0)
 
 (defmacro yf-debug-message (fmt &rest args)
   `(when yf-debug
@@ -291,11 +293,11 @@
     (>= n2 n1)))
 
 (defun yf-callq (quotation)
-  (setq yf-stack (yf--eval (reverse quotation))))
+  (setq yf-stack (yf--eval (list (reverse quotation))))) ; box
 
-(defun yf-print-overlay (text tok-start tok-end)
-  (let ((overlay (make-overlay (1+ tok-start)
-                               (1+ tok-end))))
+(defun yf-print-overlay (text)
+  (let ((overlay (make-overlay (1+ yf-tok-start)
+                               (1+ yf-tok-end))))
     (push overlay yf-overlays)
     (overlay-put overlay
                  'after-string
@@ -359,9 +361,17 @@
         (setq pos end)))
     (nreverse tokens)))
 
-(defun yf-tok (tokens) (upcase (caar tokens)))
-(defun yf-tok-start (tokens) (cadr (car tokens)))
-(defun yf-tok-end (tokens) (caddr (car tokens)))
+(defun yf-tok (tokens-box)
+  (let ((tokens (car tokens-box)))
+    (upcase (caar tokens))))
+
+(defun yf-tok-start (tokens-box)
+  (let ((tokens (car tokens-box)))
+    (cadr (car tokens))))
+
+(defun yf-tok-end (tokens-box)
+  (let ((tokens (car tokens-box)))
+    (caddr (car tokens))))
 
 (defun yf-pop ()
   (unless yf-stack
@@ -410,23 +420,13 @@
 
 (defun yf-eval (text &optional offset)
   (interactive)
-  (yf--eval (yf-parse text) offset))
-
-(defun yf--eval (tokens &optional offset)
-  "Evaluate TEXT containing postfix expression."
-  (let* ((tok nil)
-         (index 0)
-         (size (length tokens))
-         (progress (make-progress-reporter "[yf] busy.. " 0 size))
-         (tok-start 0)
-         (tok-end 0)
-         (tok-offset (or offset 0)))
+  (let ((tokens-box (list (yf-parse text))))
     (yf-def "+" (lambda () (yf-push (yf-add (yf-pop) (yf-pop)))))
     (yf-def "*" (lambda () (yf-push (yf-mul (yf-pop) (yf-pop)))))
-    (yf-def "." (lambda () (yf-print-overlay (yf-to-string (yf-pop)) tok-start tok-end)))
-    (yf-def ".S" (lambda () (yf-print-overlay (yf-show-stack) tok-start tok-end)))
+    (yf-def "." (lambda () (yf-print-overlay (yf-to-string (yf-pop)))))
+    (yf-def ".S" (lambda () (yf-print-overlay (yf-show-stack))))
     (yf-def "MESSAGE" (lambda () (message (yf-to-string (yf-pop)))))
-    (yf-def "?" (lambda () (yf-print-overlay (yf-to-string (yf-tos)) tok-start tok-end)))
+    (yf-def "?" (lambda () (yf-print-overlay (yf-to-string (yf-tos)))))
     (yf-def "-"
             (lambda ()
               (let ((b (yf-pop))
@@ -488,17 +488,17 @@
                                       yf-default-currency))))
     (yf-def "TO"
             (lambda ()
-              (let ((currency (yf-tok tokens)))
+              (let ((currency (yf-tok tokens-box)))
                 (yf-push (yf-to (yf-pop) currency)))
-              (setq tokens (cdr tokens)))) ;; consume next
+              (yf-next tokens-box)))
     (yf-def "CONST"
             (lambda ()
-              (let ((name (yf-tok tokens))
+              (let ((name (yf-tok tokens-box))
                     (val (yf-pop)))
                 (yf-debug-message "Define constant %s with value %s" name val)
                 (yf-def name (lambda () (yf-push val)))
                 (yf-refresh-word-list))
-              (setq tokens (cdr tokens)))) ;; consume next
+              (yf-next tokens-box)))
     (yf-def "["
             (lambda ()
               (setq yf-mode 'quotation)
@@ -542,24 +542,39 @@
                     (code (yf-pop)))
                 (dotimes (_ count)
                   (yf-callq code)))))
-    (yf-def "WORDS" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))
+    (yf-def "WORDS" (lambda () (yf-print-overlay (yf-words))))
     (yf-def "("
             (lambda ()
-              (while (and tokens
-                          (not (string= ")" (yf-tok tokens))))
-                (setq tokens (cdr tokens)))
-              (setq tokens (cdr tokens))))
+              (while (and (car tokens-box)
+                          (not (string= ")" (yf-tok tokens-box))))
+                (yf-next tokens-box))
+              (yf-next tokens-box)))
+    (setq yf-tok-start 0)
+    (setq yf-tok-end 0)
+    (yf--eval tokens-box offset)))
+
+(defun yf-next (tokens-box)
+  (let ((tokens (car tokens-box)))
+    (setcar tokens-box (cdr tokens))))
+
+(defun yf--eval (tokens-box &optional offset)
+  "Evaluate TEXT containing postfix expression."
+  (let* ((tok nil)
+         (index 0)
+         (size (length (car tokens-box)))
+         (progress (make-progress-reporter "[yf] busy.. " 0 size))
+         (tok-offset (or offset 0)))
     (unless yf-word-list
       (yf-refresh-word-list))
-    (while tokens
-      (setq tok (yf-tok tokens))
-      (setq tok-start (+ tok-offset (yf-tok-start tokens)))
-      (setq tok-end (+ tok-offset (yf-tok-end tokens)))
-      (setq tokens (cdr tokens))
-      (yf-debug-message "Eval token: '%s' at: %d-%d" tok tok-start tok-end)
+    (while (car tokens-box)
+      (setq tok (yf-tok tokens-box))
+      (setq yf-tok-start (+ tok-offset (yf-tok-start tokens-box)))
+      (setq yf-tok-end (+ tok-offset (yf-tok-end tokens-box)))
+      (yf-next tokens-box)
+      (yf-debug-message "Eval token: '%s' at: %d-%d" tok yf-tok-start yf-tok-end)
       (cond
        ((eq 'quotation yf-mode)
-        (yf-eval-quotation tok tok-start tok-end))
+        (yf-eval-quotation tok yf-tok-start yf-tok-end))
        ((gethash tok yf-dict)
         (funcall (gethash tok yf-dict)))
        ((yf-is-currency? tok)
@@ -572,7 +587,7 @@
         (yf-push (yf-resolve-ticker tok)))
        (t
         (user-error
-         "Unkown word: %s at: %d-%d" tok tok-start tok-end)))
+         "Unkown word: %s at: %d-%d" tok yf-tok-start yf-tok-end)))
       (progress-reporter-update progress index)
       (setq index (1+ index))
       (sit-for 0))
