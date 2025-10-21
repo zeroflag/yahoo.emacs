@@ -159,8 +159,8 @@
            (prefix (yf-add-number-grouping amount))
            (suffix (if (yf-is-default-currency? currency)
                        ""
-                     currency)))
-      (concat prefix " " suffix)))
+                     (concat " " currency))))
+      (concat prefix suffix)))
    ((listp item) ; quotation
     (concat "[ "
             (substring (format "%s" (reverse item)) 1 -1)
@@ -396,7 +396,7 @@
         (setq yf-mode 'interpret)
       (yf-add-to-quotation tok start end)))
    ((string= "[" tok)
-    ; nested quotation
+                                        ; nested quotation
     (setq yf-quotation-cnt (1+ yf-quotation-cnt))
     (yf-add-to-quotation tok start end))
    (t ; normal token
