@@ -410,7 +410,6 @@
 
 (defun yf--eval (tokens &optional offset)
   "Evaluate TEXT containing postfix expression."
-  (yf-debug-message "Eval tokens: '%s'" (car tokens-box))
   (let* ((tok nil)
          (index 0)
          (size (length tokens))
