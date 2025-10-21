@@ -150,7 +150,7 @@
 (defun yf-to-string (item)
   (cond
    ((null item)
-    "[ ]")
+    "NIL")
    ((eq item t)
     "TRUE")
    ((yf-money? item)
@@ -290,9 +290,8 @@
     (yf-check-currency a b)
     (>= n2 n1)))
 
-(defun yf-when (condt quot)
-  (when (yf-eval condt)
-    (yf-eval quot)))
+(defun yf-call (q)
+  (setq yf-stack (yf-eval (yf-join q))))
 
 (defun yf-print-overlay (text tok-start tok-end)
   (let ((overlay (make-overlay (1+ tok-start)
@@ -433,7 +432,6 @@
     (yf-def "<=" (lambda () (yf-push (yf-lte (yf-pop) (yf-pop)))))
     (yf-def ">" (lambda () (yf-push (yf-gt (yf-pop) (yf-pop)))))
     (yf-def ">=" (lambda () (yf-push (yf-gte (yf-pop) (yf-pop)))))
-    (yf-def "when" (lambda () (yf-when (yf-pop) (yf-pop))))
     (yf-def "SUM" (lambda () (setq yf-stack (yf-sum-currency-groups yf-stack))))
     (yf-def "SUMPROD"
             (lambda ()
@@ -497,12 +495,25 @@
               (setq yf-mode 'quotation)
               (setq yf-quotation-cnt 1)
               (yf-push nil))) ; list to collect quotation items
+    (yf-def "WHEN" (lambda ()
+                     (yf-call (yf-pop)) ; eval condition
+                     (let ((cond (yf-pop))
+                           (body (yf-pop)))
+                       (when cond
+                         (yf-call body)))))
+    (yf-def "UNLESS" (lambda ()
+                     (yf-call (yf-pop)) ; eval condition
+                     (let ((cond (yf-pop))
+                           (body (yf-pop)))
+                       (unless cond
+                         (yf-call body)))))
+    (yf-def "CALL" (lambda () (yf-call (yf-pop))))
     (yf-def "TIMES"
             (lambda ()
               (let ((count (car (yf-pop)))
-                    (code (yf-join (yf-pop))))
+                    (code (yf-pop)))
                 (dotimes (_ count)
-                  (yf-eval code tok-start)))))
+                  (yf-call code)))))
     (yf-def "WORDS" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))
     (yf-def "("
             (lambda ()
