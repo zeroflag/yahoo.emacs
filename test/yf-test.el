@@ -155,3 +155,6 @@
   (should (equal (eval1 "5 8 [ OVER OVER < ] [ DROP ] [ SWAP DROP ] IF") '((8 . "ANY"))))
   (should (equal (eval1 "5 3 [ OVER OVER < ] [ SWAP DROP ] [ DROP ] IF") '((3 . "ANY"))))
   (should (equal (eval1 "5 8 [ OVER OVER < ] [ SWAP DROP ] [ DROP ] IF") '((5 . "ANY")))))
+
+(ert-deftest yf-while-test ()
+  (should (equal (eval1 "1 [ DUP 10 < ] [ 1 + ] WHILE") '((10 . "ANY")))))
