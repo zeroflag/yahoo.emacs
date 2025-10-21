@@ -300,7 +300,7 @@
     (overlay-put overlay
                  'after-string
                  (concat
-                  (propertize " => " 'face `(:foreground "brow"))
+                  (propertize " => " 'face `(:foreground "brown"))
                   (propertize text 'face `(:foreground ,yf-overlay-color))))))
 
 (defun yf-delete-overlays ()
