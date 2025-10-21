@@ -387,7 +387,9 @@
 
 (defun yf-def (name lambda)
   "Define a new word with NAME and LAMBDA."
-  (puthash (upcase name) lambda yf-dict))
+  (let ((name (upcase name)))
+    (unless (gethash name yf-dict)
+      (puthash name lambda yf-dict))))
 
 (defun yf-add-to-quotation (tok start end)
   (yf-push (cons (list tok start end)
@@ -421,6 +423,7 @@
 
 (defun yf--eval (tokens-box &optional offset)
   "Evaluate TEXT containing postfix expression."
+  (yf-debug-message "Eval tokens: '%s'" (car tokens-box))
   (let* ((tok nil)
          (index 0)
          (size (length (car tokens-box)))
