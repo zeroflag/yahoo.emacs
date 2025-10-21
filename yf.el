@@ -496,19 +496,18 @@
               (setq yf-quotation-cnt 1)
               (yf-push nil))) ; list to collect quotation items
     (yf-def "WHEN" (lambda ()
-                     (yf-call (yf-pop)) ; eval condition
-                     (let ((cond (yf-pop))
-                           (body (yf-pop)))
-                       (when cond
+                     (let ((body (yf-pop))
+                           (cond (yf-pop)))
+                       (yf-call cond)
+                       (when (yf-pop)
                          (yf-call body)))))
     (yf-def "UNLESS" (lambda ()
-                     (yf-call (yf-pop)) ; eval condition
-                     (let ((cond (yf-pop))
-                           (body (yf-pop)))
-                       (unless cond
+                     (let ((body (yf-pop))
+                           (cond (yf-pop)))
+                       (yf-call cond)
+                       (unless (yf-pop)
                          (yf-call body)))))
     (yf-def "IF" (lambda ()
-                   (yf-call (yf-pop)) ; eval condition
                    (let ((cond (yf-pop))
                          (body1 (yf-pop))
                          (body2 (yf-pop)))
