@@ -507,6 +507,14 @@
                            (body (yf-pop)))
                        (unless cond
                          (yf-call body)))))
+    (yf-def "IF" (lambda ()
+                   (yf-call (yf-pop)) ; eval condition
+                   (let ((cond (yf-pop))
+                         (body1 (yf-pop))
+                         (body2 (yf-pop)))
+                     (if cond
+                         (yf-call body1)
+                       (yf-call body2)))))
     (yf-def "CALL" (lambda () (yf-call (yf-pop))))
     (yf-def "TIMES"
             (lambda ()
