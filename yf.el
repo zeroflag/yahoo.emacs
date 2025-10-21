@@ -290,8 +290,8 @@
     (yf-check-currency a b)
     (>= n2 n1)))
 
-(defun yf-call (q &optional offset)
-  (setq yf-stack (yf-eval (yf-join q) offset)))
+(defun yf-call (quotation)
+  (setq yf-stack (yf--eval quotation)))
 
 (defun yf-print-overlay (text tok-start tok-end)
   (let ((overlay (make-overlay (1+ tok-start)
@@ -381,8 +381,9 @@
   "Define a new word with NAME and LAMBDA."
   (puthash (upcase name) lambda yf-dict))
 
-(defun yf-add-to-quotation (tok)
-  (yf-push (cons tok (yf-pop))))
+(defun yf-add-to-quotation (tok start end)
+  (yf-push (cons (list tok start end)
+                 (yf-pop))))
 
 (defun yf-eval-quotation (tok start end)
   (cond
@@ -393,19 +394,21 @@
     (setq yf-quotation-cnt (1- yf-quotation-cnt))
     (if (= 0 yf-quotation-cnt)
         (setq yf-mode 'interpret)
-      (yf-add-to-quotation tok)))
+      (yf-add-to-quotation tok start end)))
    ((string= "[" tok)
     ; nested quotation
     (setq yf-quotation-cnt (1+ yf-quotation-cnt))
-    (yf-add-to-quotation tok))
+    (yf-add-to-quotation tok start end))
    (t ; normal token
-    (yf-add-to-quotation tok))))
+    (yf-add-to-quotation tok start end))))
 
 (defun yf-eval (text &optional offset)
-  "Evaluate TEXT containing postfix expression."
   (interactive)
-  (let* ((tokens (yf-parse text))
-         (tok nil)
+  (yf--eval (yf-parse text) offset))
+
+(defun yf--eval (tokens &optional offset)
+  "Evaluate TEXT containing postfix expression."
+  (let* ((tok nil)
          (index 0)
          (size (length tokens))
          (progress (make-progress-reporter "[yf] busy.. " 0 size))
@@ -499,40 +502,40 @@
             (lambda ()
               (let ((body (yf-pop))
                     (cond (yf-pop)))
-                (yf-call cond tok-start)
+                (yf-call cond)
                 (when (yf-pop)
-                  (yf-call body tok-start)))))
+                  (yf-call body)))))
     (yf-def "UNLESS"
             (lambda ()
               (let ((body (yf-pop))
                     (cond (yf-pop)))
-                (yf-call cond tok-start)
+                (yf-call cond)
                 (unless (yf-pop)
-                  (yf-call body tok-start)))))
+                  (yf-call body)))))
     (yf-def "IF"
             (lambda ()
               (let ((body1 (yf-pop))
                     (body2 (yf-pop))
                     (cond (yf-pop)))
-                (yf-call cond tok-start)
+                (yf-call cond)
                 (if (yf-pop)
-                    (yf-call body1 tok-start)
-                  (yf-call body2 tok-start)))))
+                    (yf-call body1)
+                  (yf-call body2)))))
     (yf-def "WHILE"
             (lambda ()
               (let ((body (yf-pop))
                     (cond (yf-pop)))
-                (yf-call cond tok-start)
+                (yf-call cond)
                 (while (yf-pop)
-                  (yf-call body tok-start)
-                  (yf-call cond tok-start)))))
-    (yf-def "CALL" (lambda () (yf-call (yf-pop) tok-start)))
+                  (yf-call body)
+                  (yf-call cond)))))
+    (yf-def "CALL" (lambda () (yf-call (yf-pop))))
     (yf-def "TIMES"
             (lambda ()
               (let ((count (car (yf-pop)))
                     (code (yf-pop)))
                 (dotimes (_ count)
-                  (yf-call code tok-start)))))
+                  (yf-call code)))))
     (yf-def "WORDS" (lambda () (yf-print-overlay (yf-words) tok-start tok-end)))
     (yf-def "("
             (lambda ()
