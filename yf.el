@@ -377,11 +377,15 @@
   (setq yf-word-list '())
   (setq yf-dict (yf-new-ht)))
 
-(defun yf-def (name lambda)
+(defun yf-def-- (name lambda)
+  ;; TODO fixme
   "Define a new word with NAME and LAMBDA."
   (let ((name (upcase name)))
     (unless (gethash name yf-dict)
       (puthash name lambda yf-dict))))
+
+(defun yf-def (name lambda)
+  (puthash (upcase name) lambda yf-dict))
 
 (defun yf-add-to-quotation (tok start end)
   (yf-push (cons (list tok start end)
