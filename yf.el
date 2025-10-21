@@ -389,7 +389,7 @@
 
 (defmacro yf-def (name &rest body)
   `(puthash (upcase ,name)
-    (lambda (tokens-box)
+    (lambda (_tokens-box)
       ,@body)
     yf-dict))
 
@@ -474,16 +474,16 @@
     (yf-def "DEPTH"
             (yf-push (cons (length yf-stack) yf-default-currency)))
     (yf-def "TO"
-            (let ((currency (yf-tok tokens-box)))
+            (let ((currency (yf-tok _tokens-box)))
               (yf-push (yf-to (yf-pop) currency)))
-            (yf-next tokens-box))
+            (yf-next _tokens-box))
     (yf-def "CONST"
-            (let ((name (yf-tok tokens-box))
+            (let ((name (yf-tok _tokens-box))
                   (val (yf-pop)))
               (yf-debug-message "Define constant %s with value %s" name val)
               (yf-def name (yf-push val))
               (yf-refresh-word-list))
-            (yf-next tokens-box))
+            (yf-next _tokens-box))
     (yf-def "["
             (setq yf-mode 'quotation)
             (setq yf-quotation-cnt 1)
@@ -523,10 +523,10 @@
                 (yf-callq code))))
     (yf-def "WORDS" (yf-print-overlay (yf-words)))
     (yf-def "("
-            (while (and (car tokens-box)
-                        (not (string= ")" (yf-tok tokens-box))))
-              (yf-next tokens-box))
-            (yf-next tokens-box))
+            (while (and (car _tokens-box)
+                        (not (string= ")" (yf-tok _tokens-box))))
+              (yf-next _tokens-box))
+            (yf-next _tokens-box))
     (setq yf-tok-start 0)
     (setq yf-tok-end 0)
     (yf--eval tokens-box offset)))
