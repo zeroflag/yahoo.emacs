@@ -150,5 +150,8 @@
 (ert-deftest yf-if-test ()
   (should (equal (eval1 "[ 4 5 < ] [ 2 ] [ 10 ] IF") '((10 . "ANY"))))
   (should (equal (eval1 "3 [ 1 2 < ] [ DROP ] [ DUP * ] IF") '((9 . "ANY"))))
-  (should (equal (eval1 "[ 4 5 > ] [ 2 ] [ 10 ] IF") '((2 . "ANY")))))
-
+  (should (equal (eval1 "[ 4 5 > ] [ 2 ] [ 10 ] IF") '((2 . "ANY"))))
+  (should (equal (eval1 "5 3 [ OVER OVER < ] [ DROP ] [ SWAP DROP ] IF") '((5 . "ANY"))))
+  (should (equal (eval1 "5 8 [ OVER OVER < ] [ DROP ] [ SWAP DROP ] IF") '((8 . "ANY"))))
+  (should (equal (eval1 "5 3 [ OVER OVER < ] [ SWAP DROP ] [ DROP ] IF") '((3 . "ANY"))))
+  (should (equal (eval1 "5 8 [ OVER OVER < ] [ SWAP DROP ] [ DROP ] IF") '((5 . "ANY")))))
