@@ -355,7 +355,7 @@
   (let* ((tokens (car tcell))
          (tok (caar tokens)))
     (if (yf-str? tok)
-        tok
+        (replace-regexp-in-string "\\\\n" "\n" tok)
       (upcase tok))))
 
 (defun yf-tok-start (tcell)
