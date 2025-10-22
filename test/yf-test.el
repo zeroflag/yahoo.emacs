@@ -129,8 +129,14 @@
 
 (ert-deftest yf-quotation-test ()
   (should (equal (eval1 "1 [ 2 * ] 10 TIMES") '((1024 . "ANY"))))
+  (should (equal (eval1 "( -- ) [ ( -- ) 2 ( -- ) DUP ( -- ) * ( -- ) ] ( -- ) CALL") '((4 . "ANY"))))
+  (should (equal (eval1 "[ 12 USD ] CALL") '((12 . "USD"))))
+  (should (equal (eval1 "12 [ TO EUR ] CALL") '((12 . "EUR"))))
+  (should (equal (eval1 "12 [ [ TO EUR ] CALL ] CALL") '((12 . "EUR"))))
+  (should (equal (eval1 "12 [ [ [ TO EUR ( -- ) ] ( -- ) CALL ] CALL ] CALL") '((12 . "EUR"))))
+  (should (equal (eval1 "12 [ ( -- ) TO EUR ( -- ) ] CALL") '((12 . "EUR"))))
   (should (equal (eval1 "1 [ 2 * [ 1 + ] 3 TIMES ] 2 TIMES") '((13 . "ANY")))))
-
+
 (ert-deftest yf-when-test ()
   (should (equal (eval1 "[ 4 5 < ] [ 5 2 - ] WHEN") '((3 . "ANY"))))
   (should (equal (eval1 "[ 4 5 < ] [ 42 ] WHEN") '((42 . "ANY"))))
