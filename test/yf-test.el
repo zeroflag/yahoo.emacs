@@ -177,3 +177,6 @@
 
 (ert-deftest yf-while-test ()
   (should (equal (eval1 "1 [ DUP 10 < ] [ 1 + ] WHILE") '((10 . "ANY")))))
+
+(ert-deftest yf-until-test ()
+  (should (equal (eval1 "1 [ 1 + DUP 10 > ] UNTIL") '((11 . "ANY")))))
