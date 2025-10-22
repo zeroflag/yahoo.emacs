@@ -75,13 +75,13 @@
 
 (defmacro yf-def (name &rest body)
   `(puthash (upcase ,name)
-    (lambda (&optional _tokens-box)
+    (lambda (&optional _tcell)
       ,@body)
     yf-dict))
 
 (defmacro yf-defp (name &rest body)
   `(puthash (upcase ,name)
-    (lambda (_tokens-box)
+    (lambda (_tcell)
       ,@body)
     yf-dict))
 
@@ -373,16 +373,16 @@
         (setq pos end)))
     (nreverse tokens)))
 
-(defun yf-tok (tokens-box)
-  (let ((tokens (car tokens-box)))
+(defun yf-tok (tcell)
+  (let ((tokens (car tcell)))
     (upcase (caar tokens))))
 
-(defun yf-tok-start (tokens-box)
-  (let ((tokens (car tokens-box)))
+(defun yf-tok-start (tcell)
+  (let ((tokens (car tcell)))
     (cadr (car tokens))))
 
-(defun yf-tok-end (tokens-box)
-  (let ((tokens (car tokens-box)))
+(defun yf-tok-end (tcell)
+  (let ((tokens (car tcell)))
     (caddr (car tokens))))
 
 (defun yf-pop ()
@@ -478,25 +478,25 @@
   (yf-def "DEPTH"
           (yf-push (cons (length yf-stack) yf-default-currency)))
   (yf-defp "TO"
-           (let ((currency (yf-tok _tokens-box)))
+           (let ((currency (yf-tok _tcell)))
              (yf-push (yf-to (yf-pop) currency)))
-           (yf-next _tokens-box))
+           (yf-next _tcell))
   (yf-defp "CONST"
-           (let ((name (yf-tok _tokens-box))
+           (let ((name (yf-tok _tcell))
                  (val (yf-pop)))
              (yf-debug-message "Define constant %s with value %s" name val)
              (yf-def name (yf-push val))
              (yf-refresh-word-list))
-           (yf-next _tokens-box))
+           (yf-next _tcell))
   (yf-defp "["
            (setq yf-mode 'quotation)
            (setq yf-quotation-cnt 1)
            (yf-push nil)) ; list to collect quotation items
   (yf-defp "("
-           (while (and (car _tokens-box)
-                       (not (string= ")" (yf-tok _tokens-box))))
-             (yf-next _tokens-box))
-           (yf-next _tokens-box))
+           (while (and (car _tcell)
+                       (not (string= ")" (yf-tok _tcell))))
+             (yf-next _tcell))
+           (yf-next _tcell))
   (yf-def "WHEN"
           (let ((body (yf-pop))
                 (cond (yf-pop)))
@@ -534,36 +534,36 @@
   (setq yf-tok-start 0)
   (setq yf-tok-end 0))
 
+(defun yf-next (tcell)
+  (let ((tokens (car tcell)))
+    (setcar tcell (cdr tokens))))
+
 (defun yf-eval (text &optional offset)
   (interactive)
   (when (zerop (hash-table-count yf-dict))
     (yf-define-built-ins))
   (yf--eval (list (yf-parse text)) offset))
 
-(defun yf-next (tokens-box)
-  (let ((tokens (car tokens-box)))
-    (setcar tokens-box (cdr tokens))))
-
-(defun yf--eval (tokens-box &optional offset)
+(defun yf--eval (tcell &optional offset)
   "Evaluate TEXT containing postfix expression."
   (let* ((tok nil)
          (index 0)
-         (size (length (car tokens-box)))
+         (size (length (car tcell)))
          (progress (make-progress-reporter "[yf] busy.. " 0 size))
          (tok-offset (or offset 0)))
     (unless yf-word-list
       (yf-refresh-word-list))
-    (while (car tokens-box)
-      (setq tok (yf-tok tokens-box))
-      (setq yf-tok-start (+ tok-offset (yf-tok-start tokens-box)))
-      (setq yf-tok-end (+ tok-offset (yf-tok-end tokens-box)))
-      (yf-next tokens-box)
+    (while (car tcell)
+      (setq tok (yf-tok tcell))
+      (setq yf-tok-start (+ tok-offset (yf-tok-start tcell)))
+      (setq yf-tok-end (+ tok-offset (yf-tok-end tcell)))
+      (yf-next tcell)
       (yf-debug-message "Eval token: '%s' at: %d-%d" tok yf-tok-start yf-tok-end)
       (cond
        ((eq 'quotation yf-mode)
         (yf-eval-quotation tok yf-tok-start yf-tok-end))
        ((gethash tok yf-dict)
-        (funcall (gethash tok yf-dict) tokens-box))
+        (funcall (gethash tok yf-dict) tcell))
        ((yf-is-currency? tok)
         (yf-push (cons (car (yf-pop))
                        (upcase tok))))
