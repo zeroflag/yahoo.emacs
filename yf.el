@@ -417,6 +417,15 @@
   (yf-def ">=" (yf-push (yf-gte (yf-pop) (yf-pop))))
   (yf-def "=" (yf-push (yf-eq (yf-pop) (yf-pop))))
   (yf-def "<>" (yf-push (yf-neq (yf-pop) (yf-pop))))
+  (yf-def "OR"
+          (let ((b (yf-pop))
+                (a (yf-pop)))
+            (yf-push (or a b))))
+  (yf-def "AND" 
+          (let ((b (yf-pop))
+                (a (yf-pop)))
+            (yf-push (and a b))))
+  (yf-def "NOT" (yf-push (not (yf-pop))))
   (yf-def "SUM" (setq yf-stack (yf-sum-currency-groups yf-stack)))
   (yf-def "SUMPROD"
           (setq yf-stack (yf-prod-pairs yf-stack))

@@ -59,6 +59,18 @@
   (should (equal (eval1 "-3 -2 >") '( nil )))
   (should (equal (eval1 "-1 -2 >=") '( t ))))
 
+(ert-deftest yf-logic-test ()
+  (should (equal (eval1 "0 0 =  ( T ) 0 0 =  ( T ) AND") '( t )))
+  (should (equal (eval1 "0 0 <> ( F ) 0 0 =  ( T ) AND") '( nil )))
+  (should (equal (eval1 "0 0 =  ( T ) 0 0 <> ( F ) AND") '( nil )))
+  (should (equal (eval1 "0 0 <> ( F ) 0 0 <> ( F ) AND") '( nil )))
+  (should (equal (eval1 "0 0 =  ( T ) 0 0 =  ( T ) OR") '( t )))
+  (should (equal (eval1 "0 0 <> ( F ) 0 0 =  ( T ) OR") '( t )))
+  (should (equal (eval1 "0 0 =  ( T ) 0 0 <> ( F ) OR") '( t )))
+  (should (equal (eval1 "0 0 <> ( F ) 0 0 <> ( F ) OR") '( nil )))
+  (should (equal (eval1 "0 0 <> ( F ) not") '( t )))
+  (should (equal (eval1 "0 0 =  ( T ) not") '( nil ))))
+
 (ert-deftest yf-sum-test ()
   (should (equal (eval1 "sum") '()))
   (should (equal (eval1 "10 sum")
