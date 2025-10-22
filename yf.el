@@ -253,7 +253,7 @@
      (let ((n1 (car a))
            (n2 (car b)))
        (yf-check-currency a b)
-       (,op n1 n2))))
+       (,op n2 n1))))
 
 (yf-def-binop yf-add +)
 (yf-def-binop yf-sub -)
