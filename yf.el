@@ -246,11 +246,27 @@
        (cons (,op n1 n2)
              (yf-pick-currency a b)))))
 
+(defmacro yf-def-cmp (name op)
+  "Define a money comparison function NAME using operator OP."
+  `(defun ,name (a b)
+     (yf-expect-money (list a b))
+     (let ((n1 (car a))
+           (n2 (car b)))
+       (yf-check-currency a b)
+       (,op n1 n2))))
+
 (yf-def-binop yf-add +)
 (yf-def-binop yf-sub -)
 (yf-def-binop yf-mul *)
 (yf-def-binop yf-mod mod)
 (yf-def-binop yf-div / float)
+
+(yf-def-cmp yf-lt <)
+(yf-def-cmp yf-lte <=)
+(yf-def-cmp yf-gt >)
+(yf-def-cmp yf-gte >=)
+(yf-def-cmp yf-eq =)
+(yf-def-cmp yf-neq /=)
 
 (defun yf-prod-pairs (xs)
   (if (< (length xs) 2)
@@ -259,41 +275,6 @@
           (second (cadr xs)))
       (cons (yf-mul first second)
             (yf-prod-pairs (cddr xs))))))
-
-(defun yf-lt (a b)
-  (yf-expect-money (list a b))
-  (let ((n1 (car a))
-        (n2 (car b)))
-    (yf-check-currency a b)
-    (< n2 n1)))
-
-(defun yf-lte (a b)
-  (yf-expect-money (list a b))
-  (let ((n1 (car a))
-        (n2 (car b)))
-    (yf-check-currency a b)
-    (<= n2 n1)))
-
-(defun yf-gt (a b)
-  (yf-expect-money (list a b))
-  (let ((n1 (car a))
-        (n2 (car b)))
-    (yf-check-currency a b)
-    (> n2 n1)))
-
-(defun yf-gte (a b)
-  (yf-expect-money (list a b))
-  (let ((n1 (car a))
-        (n2 (car b)))
-    (yf-check-currency a b)
-    (>= n2 n1)))
-
-(defun yf-eq (a b)
-  (yf-expect-money (list a b))
-  (let ((n1 (car a))
-        (n2 (car b)))
-    (yf-check-currency a b)
-    (= n2 n1)))
 
 (defun yf-callq (quotation)
   (setq yf-stack (yf--eval (list (reverse quotation))))) ; box
@@ -435,6 +416,7 @@
   (yf-def ">" (yf-push (yf-gt (yf-pop) (yf-pop))))
   (yf-def ">=" (yf-push (yf-gte (yf-pop) (yf-pop))))
   (yf-def "=" (yf-push (yf-eq (yf-pop) (yf-pop))))
+  (yf-def "<>" (yf-push (yf-neq (yf-pop) (yf-pop))))
   (yf-def "SUM" (setq yf-stack (yf-sum-currency-groups yf-stack)))
   (yf-def "SUMPROD"
           (setq yf-stack (yf-prod-pairs yf-stack))
