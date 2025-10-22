@@ -288,6 +288,13 @@
     (yf-check-currency a b)
     (>= n2 n1)))
 
+(defun yf-eq (a b)
+  (yf-expect-money (list a b))
+  (let ((n1 (car a))
+        (n2 (car b)))
+    (yf-check-currency a b)
+    (= n2 n1)))
+
 (defun yf-callq (quotation)
   (setq yf-stack (yf--eval (list (reverse quotation))))) ; box
 
@@ -427,6 +434,7 @@
   (yf-def "<=" (yf-push (yf-lte (yf-pop) (yf-pop))))
   (yf-def ">" (yf-push (yf-gt (yf-pop) (yf-pop))))
   (yf-def ">=" (yf-push (yf-gte (yf-pop) (yf-pop))))
+  (yf-def "=" (yf-push (yf-eq (yf-pop) (yf-pop))))
   (yf-def "SUM" (setq yf-stack (yf-sum-currency-groups yf-stack)))
   (yf-def "SUMPROD"
           (setq yf-stack (yf-prod-pairs yf-stack))
@@ -512,6 +520,11 @@
             (while (yf-pop)
               (yf-callq body)
               (yf-callq cond))))
+  (yf-def "UNTIL"
+          (let ((body (yf-pop)))
+            (yf-callq body)
+            (while (not (yf-pop))
+              (yf-callq body))))
   (yf-def "CALL" (yf-callq (yf-pop)))
   (yf-def "TIMES"
           (let ((count (car (yf-pop)))
