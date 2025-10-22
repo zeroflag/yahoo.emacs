@@ -473,7 +473,7 @@
   (yf-def "CLEAR" (yf-clear))
   (yf-def "DEPTH"
           (yf-push (cons (length yf-stack) yf-default-currency)))
-  (yf-def "CONVERT"
+  (yf-def "XCHG"
           (let ((currency (yf-pop))
                 (amount (yf-pop)))
             (yf-push (yf-to amount currency))))
