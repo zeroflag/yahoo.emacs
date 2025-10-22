@@ -158,7 +158,8 @@
     num))
 
 (defun yf-money? (pair)
-  (and (numberp (car pair))
+  (and (consp pair)
+       (numberp (car pair))
        (stringp (cdr pair))))
 
 (defun yf-to-string (item)
@@ -329,6 +330,10 @@
 (defun yf-ticker? (token)
   (string-match yf-ticker-regexp token))
 
+(defun yf-str? (token)
+  (and (string-prefix-p "\"" token)
+       (string-suffix-p "\"" token)))
+
 (defun yf-resolve-ticker (token)
   (let ((ticker (match-string 1 token)))
     (yf-get ticker)))
@@ -336,8 +341,9 @@
 (defun yf-parse (text)
   "Parse TEXT and return tokens in the following format: ( ( token start end ) .. )."
   (let ((pos 0)
+        (pattern "\\(\"[^\"]*\"\\|[^[:space:]\r\n]+\\)")
         (tokens '()))
-    (while (string-match "[^[:space:]\r\n]+" text pos)
+    (while (string-match pattern text pos)
       (let ((start (match-beginning 0))
             (end   (match-end 0))
             (token (match-string 0 text)))
@@ -346,8 +352,11 @@
     (nreverse tokens)))
 
 (defun yf-tok (tcell)
-  (let ((tokens (car tcell)))
-    (upcase (caar tokens))))
+  (let* ((tokens (car tcell))
+         (tok (caar tokens)))
+    (if (yf-str? tok)
+        tok
+      (upcase tok))))
 
 (defun yf-tok-start (tcell)
   (let ((tokens (car tcell)))
@@ -464,6 +473,10 @@
   (yf-def "CLEAR" (yf-clear))
   (yf-def "DEPTH"
           (yf-push (cons (length yf-stack) yf-default-currency)))
+  (yf-def "CONVERT"
+          (let ((currency (yf-pop))
+                (amount (yf-pop)))
+            (yf-push (yf-to amount currency))))
   (yf-defp "TO"
            (let ((currency (yf-tok _tcell)))
              (yf-push (yf-to (yf-pop) currency)))
@@ -564,6 +577,8 @@
                        yf-default-currency)))
        ((yf-ticker? tok)
         (yf-push (yf-resolve-ticker tok)))
+       ((yf-str? tok)
+        (yf-push (substring tok 1 -1)))
        (t
         (user-error
          "Unkown word: %s at: %d-%d" tok yf-tok-start yf-tok-end)))

@@ -195,3 +195,6 @@
 
 (ert-deftest yf-until-test ()
   (should (equal (eval1 "1 [ 1 + DUP 10 > ] UNTIL") '((11 . "ANY")))))
+
+(ert-deftest yf-str-test ()
+  (should (equal (eval1 "\"Hello World !\"") '("Hello World !"))))
