@@ -515,8 +515,8 @@
                 (cond (yf-pop)))
             (yf-callq cond)
             (if (yf-pop)
-                (yf-callq body1)
-              (yf-callq body2))))
+                (yf-callq body2)
+              (yf-callq body1))))
   (yf-def "WHILE"
           (let ((body (yf-pop))
                 (cond (yf-pop)))
