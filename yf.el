@@ -407,7 +407,7 @@
   (yf-def "." (yf-print-overlay (yf-to-string (yf-pop))))
   (yf-def ".S" (yf-print-overlay (yf-show-stack)))
   (yf-def "MESSAGE" (message (yf-to-string (yf-pop))))
-  (yf-def "PRINT" (princ (yf-to-string (yf-pop))))
+  (yf-def "PRINC" (princ (yf-to-string (yf-pop))))
   (yf-def "?" (yf-print-overlay (yf-to-string (yf-tos))))
   (yf-def "-"
           (let ((b (yf-pop))
