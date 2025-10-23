@@ -441,6 +441,7 @@
                 (a (yf-pop)))
             (yf-push (and a b))))
   (yf-def "NOT" (yf-push (not (yf-pop))))
+  (yf-def "NIL" (yf-push nil))
   (yf-def "SUM" (setq yf-stack (yf-sum-currency-groups yf-stack)))
   (yf-def "SUMPROD"
           (setq yf-stack (yf-prod-pairs yf-stack))

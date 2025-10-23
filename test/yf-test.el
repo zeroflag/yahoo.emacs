@@ -199,6 +199,9 @@
 (ert-deftest yf-str-test ()
   (should (equal (eval1 "\"Hello World !\"") '("Hello World !"))))
 
+(ert-deftest yf-nil-test ()
+  (should (equal (eval1 "nil") '(nil))))
+
 (ert-deftest yf-forge-test ()
   (eval1 "[ 1 + ] FORGE INC")
   (eval1 "[ DUP * ] FORGE SQUARE")
