@@ -27,7 +27,9 @@
   "File to save command history for `yf-repl-mode'.")
 
 (defun yf-repl--input-sender (proc input)
-  (yf-eval input (- yf-repl-last-prompt-end 1))
+  (if (string= input "cls")
+      (comint-clear-buffer)
+    (yf-eval input (- yf-repl-last-prompt-end 1)))
   (let ((output (yf-show-stack)))
     (comint-output-filter proc (concat output "\n"))
     (comint-output-filter proc yf-repl-prompt))
