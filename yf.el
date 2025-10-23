@@ -24,6 +24,7 @@
   (concat yf-api-url "/" (url-hexify-string ticker)))
 
 (defvar yf-debug nil)
+(defvar yf-show-progress t)
 (defvar yf-overlays '())
 (defvar yf-overlay-color "green")
 (defvar yf-cache-ttl-sec (* 5 60))
@@ -544,20 +545,18 @@
   (let ((tokens (car tcell)))
     (setcar tcell (cdr tokens))))
 
-(defun yf-eval (text &optional offset no-progress)
+(defun yf-eval (text &optional offset)
   (interactive)
   (when (zerop (hash-table-count yf-dict))
     (yf-define-built-ins))
-  (yf--eval (list (yf-parse text))
-            offset
-            no-progress))
+  (yf--eval (list (yf-parse text)) offset))
 
-(defun yf--eval (tcell &optional offset no-progress)
+(defun yf--eval (tcell &optional offset)
   "Evaluate TEXT containing postfix expression."
   (let* ((tok nil)
          (index 0)
          (size (length (car tcell)))
-         (progress (unless no-progress
+         (progress (when yf-show-progress
                      (make-progress-reporter "[yf] busy.. " 0 size)))
          (tok-offset (or offset 0)))
     (unless yf-word-list
