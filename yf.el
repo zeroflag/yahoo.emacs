@@ -125,7 +125,8 @@
     (yf-debug-message "Status code: %d" code)
     (if (yf-http-success? code)
         (yf-extract (request-response-data response) ticker)
-      (error "Could not get price of %s. Status code: %d" ticker code))))
+      (error "Could not get price of %s. Status code: %d"
+             ticker code))))
 
 (defun yf-memoize (f)
   "Memoize the function F, which can take any number of arguments."
@@ -152,7 +153,8 @@
 (defun yf-add-number-grouping (number &optional separator)
   (let ((num (format "%.2f" number))
         (op (or separator ",")))
-    (while (string-match "\\(.*[0-9]\\)\\([0-9][0-9][0-9].*\\)" num)
+    (while (string-match "\\(.*[0-9]\\)\\([0-9][0-9][0-9].*\\)"
+                         num)
       (setq num (concat
                  (match-string 1 num) op
                  (match-string 2 num))))
@@ -266,6 +268,7 @@
 (yf-def-binop yf-mul *)
 (yf-def-binop yf-mod mod)
 (yf-def-binop yf-div / float)
+(yf-def-binop yf-idiv /)
 
 (yf-def-cmp yf-lt <)
 (yf-def-cmp yf-lte <=)
@@ -422,6 +425,10 @@
           (let ((b (yf-pop))
                 (a (yf-pop)))
             (yf-push (yf-div a b))))
+  (yf-def "DIV"
+          (let ((b (yf-pop))
+                (a (yf-pop)))
+            (yf-push (yf-idiv a b))))
   (yf-def "MOD"
           (let ((b (yf-pop))
                 (a (yf-pop)))
@@ -494,7 +501,6 @@
   (yf-defp "CONST"
            (let ((name (yf-tok _tcell))
                  (val (yf-pop)))
-             (yf-debug-message "Define constant %s with value %s" name val)
              (yf-def name (yf-push val))
              (yf-refresh-word-list))
            (yf-next _tcell))
