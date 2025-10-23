@@ -105,8 +105,8 @@
     (when (or (not price) (not currency))
       (error "Missing price and/or currency of '%s'" ticker))
     (if (string= "GBp" currency)
-        (cons (/ price 100) currency)
-      (cons price currency))))
+        (cons (/ price 100) (upcase currency))
+      (cons price (upcase currency)))))
 
 (defun yf-http-success? (code)
   (and (<= code 299) (>= code 200)))
