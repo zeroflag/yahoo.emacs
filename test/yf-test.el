@@ -202,8 +202,10 @@
 (ert-deftest yf-forge-test ()
   (eval1 "[ 1 + ] FORGE INC")
   (eval1 "[ DUP * ] FORGE SQUARE")
+  (eval1 "[ SQUARE INC ] FORGE SQUARE+1")
   (should (equal (eval1 "3 INC") '((4 . "ANY"))))
-  (should (equal (eval1 "3 SQUARE") '((9 . "ANY")))))
+  (should (equal (eval1 "3 SQUARE") '((9 . "ANY"))))
+  (should (equal (eval1 "3 SQUARE+1") '((10 . "ANY")))))
 
 (defun yf-currency-sets-equal (a b)
   (equal (cl-sort (copy-sequence a) #'string< :key #'cdr)
