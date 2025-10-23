@@ -77,13 +77,13 @@
                  '((10 . "ANY"))))
   (should (equal (eval1 "2 3 4 5 sum")
                  '((14 . "ANY"))))
-  (should (equal (eval1 "4 USD 1 USD 6 EUR 2 EUR sum")
+  (should (yf-currency-sets-equal (eval1 "4 USD 1 USD 6 EUR 2 EUR sum")
                  '((8 . "EUR") (5 . "USD"))))
-  (should (equal (eval1 "4 USD 1 USD 10 GBP 6 EUR 2 EUR sum")
+  (should (yf-currency-sets-equal (eval1 "4 USD 1 USD 10 GBP 6 EUR 2 EUR sum")
                  '((8 . "EUR") (10 . "GBP") (5 . "USD"))))
-  (should (equal (eval1 "4 USD 2 1 USD 10 GBP 6 EUR 2 EUR 1 sum")
+  (should (yf-currency-sets-equal (eval1 "4 USD 2 1 USD 10 GBP 6 EUR 2 EUR 1 sum")
                  '((9 . "EUR") (10 . "GBP") (7 . "USD"))))
-  (should (equal (eval1 "1 GBP 5 USD 8 HUF 10 EUR 20 EUR 30 EUR sum")
+  (should (yf-currency-sets-equal (eval1 "1 GBP 5 USD 8 HUF 10 EUR 20 EUR 30 EUR sum")
                  '((60 . "EUR") (8 . "HUF") (5 . "USD") (1 . "GBP")))))
 
 (ert-deftest yf-stack-test ()
@@ -198,3 +198,7 @@
 
 (ert-deftest yf-str-test ()
   (should (equal (eval1 "\"Hello World !\"") '("Hello World !"))))
+
+(defun yf-currency-sets-equal (a b)
+  (equal (cl-sort (copy-sequence a) #'string< :key #'cdr)
+         (cl-sort (copy-sequence b) #'string< :key #'cdr)))
