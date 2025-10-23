@@ -480,6 +480,9 @@
   (yf-def "CLEAR" (yf-clear))
   (yf-def "DEPTH"
           (yf-push (cons (length yf-stack) yf-default-currency)))
+  (yf-def "PRICE"
+          (let ((ticker (yf-pop)))
+            (yf-push (yf-get ticker))))
   (yf-def "XCHG"
           (let ((currency (yf-pop))
                 (amount (yf-pop)))
