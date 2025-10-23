@@ -283,7 +283,7 @@
             (yf-prod-pairs (cddr xs))))))
 
 (defun yf-callq (quotation)
-  (setq yf-stack (yf--eval (list (reverse quotation))))) ; box
+  (setq yf-stack (yf--eval (list (reverse quotation)) nil t)))
 
 (defun yf-print-overlay (text)
   (let ((overlay (make-overlay (1+ yf-tok-start)
@@ -561,12 +561,13 @@
     (yf-define-built-ins))
   (yf--eval (list (yf-parse text)) offset))
 
-(defun yf--eval (tcell &optional offset)
+(defun yf--eval (tcell &optional offset disable-progress)
   "Evaluate TEXT containing postfix expression."
   (let* ((tok nil)
          (index 0)
          (size (length (car tcell)))
-         (progress (when yf-show-progress
+         (progress (when (and yf-show-progress
+                              (not disable-progress))
                      (make-progress-reporter "[yf] busy.. " 0 size)))
          (tok-offset (or offset 0)))
     (unless yf-word-list
