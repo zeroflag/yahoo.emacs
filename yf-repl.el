@@ -26,9 +26,13 @@
   (expand-file-name "yf-repl-history" user-emacs-directory)
   "File to save command history for `yf-repl-mode'.")
 
+(defun yf-repl-clear ()
+  (yf-delete-overlays)
+  (comint-clear-buffer))
+
 (defun yf-repl--input-sender (proc input)
   (if (string= input "cls")
-      (comint-clear-buffer)
+      (yf-repl-clear)
     (yf-eval input (- yf-repl-last-prompt-end 1)))
   (let ((output (yf-show-stack)))
     (comint-output-filter proc (concat output "\n"))
