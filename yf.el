@@ -544,18 +544,21 @@
   (let ((tokens (car tcell)))
     (setcar tcell (cdr tokens))))
 
-(defun yf-eval (text &optional offset)
+(defun yf-eval (text &optional offset no-progress)
   (interactive)
   (when (zerop (hash-table-count yf-dict))
     (yf-define-built-ins))
-  (yf--eval (list (yf-parse text)) offset))
+  (yf--eval (list (yf-parse text))
+            offset
+            no-progress))
 
-(defun yf--eval (tcell &optional offset)
+(defun yf--eval (tcell &optional offset no-progress)
   "Evaluate TEXT containing postfix expression."
   (let* ((tok nil)
          (index 0)
          (size (length (car tcell)))
-         (progress (make-progress-reporter "[yf] busy.. " 0 size))
+         (progress (unless no-progress
+                     (make-progress-reporter "[yf] busy.. " 0 size)))
          (tok-offset (or offset 0)))
     (unless yf-word-list
       (yf-refresh-word-list))
@@ -583,10 +586,12 @@
        (t
         (user-error
          "Unkown word: %s at: %d-%d" tok yf-tok-start yf-tok-end)))
-      (progress-reporter-update progress index)
-      (setq index (1+ index))
-      (sit-for 0))
-    (progress-reporter-done progress))
+      (when progress
+        (progress-reporter-update progress index)
+        (setq index (1+ index))
+        (sit-for 0)))
+    (when progress
+      (progress-reporter-done progress)))
   yf-stack)
 
 (defun yf-show-stack ()
