@@ -216,15 +216,6 @@
   (unless (yf-currency-match a b)
     (user-error "Currency mismatch %s - %s" a b)))
 
-(defun yf-first-non-any (table)
-  (let (found)
-    (maphash (lambda (currency _amount)
-               (unless (or found
-                           (equal currency yf-default-currency))
-                 (setq found currency)))
-             table)
-    found))
-
 (defun yf-sum-currency-groups (xs)
   "Sum a list of (amount . currency) pairs by currency."
   (let ((table (make-hash-table :test #'equal)))
@@ -233,14 +224,6 @@
              (currency (cdr pair))
              (current (gethash currency table 0)))
         (puthash currency (+ amount current) table)))
-    ;; Add any to one of the groups
-    (let ((any (gethash yf-default-currency table))
-          (currency (yf-first-non-any table)))
-      (when (and any currency)
-        (puthash currency
-                 (+ any (gethash currency table))
-                 table)
-        (remhash yf-default-currency table)))
     ;; Transform back to list
     (let (result)
       (maphash (lambda (currency amount)
