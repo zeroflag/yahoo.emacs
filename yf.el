@@ -494,15 +494,20 @@
              (yf-def name (yf-push val))
              (yf-refresh-word-list))
            (yf-next _tcell))
-  (yf-defp "["
-           (setq yf-mode 'quotation)
-           (setq yf-quotation-cnt 1)
-           (yf-push nil)) ; list to collect quotation items
+  (yf-defp "FORGE"
+           (let ((name (yf-tok _tcell))
+                 (body (yf-pop)))
+             (yf-def name (yf-callq body)))
+           (yf-next _tcell))
   (yf-defp "("
            (while (and (car _tcell)
                        (not (string= ")" (yf-tok _tcell))))
              (yf-next _tcell))
            (yf-next _tcell))
+  (yf-def "["
+           (setq yf-mode 'quotation)
+           (setq yf-quotation-cnt 1)
+           (yf-push nil)) ; list to collect quotation items
   (yf-def "WHEN"
           (let ((body (yf-pop))
                 (cond (yf-pop)))
