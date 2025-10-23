@@ -27,7 +27,7 @@
 (defvar yf-show-progress t)
 (defvar yf-overlays '())
 (defvar yf-overlay-color "green")
-(defvar yf-cache-ttl-sec (* 5 60))
+(defvar yf-cache-ttl-sec (* 10 60))
 
 (defconst yf-default-currency "ANY")
 (defconst yf-ticker-regexp "\\$\\([[:word:].=]+\\)")
