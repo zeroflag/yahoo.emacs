@@ -10,7 +10,7 @@ It's written in Emacs Lisp, with live price fetching from *Yahoo Finance*, memoi
 
 <img src="imgs/demo.gif" alt="fib" />
 
-`yf.el` includes a major mode, a REPL mode and interactive `elisp` function.s
+`yf.el` includes a major mode, a REPL mode and interactive `elisp` functions. Its DSL uses a syntax similar to Forth and Factor.
 
 
 ## 💡 Example
