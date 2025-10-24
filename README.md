@@ -145,4 +145,5 @@ $AAPL .            => 180.25 USD
 ## 📜 License
 
 MIT License © 2025 — Attila Magyar
+
 Use it freely, modify, and share — but please be kind to the Yahoo Finance API.
