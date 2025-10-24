@@ -139,8 +139,8 @@ Below is the current word reference, grouped by category.
 Examples:
 
 ```Forth
-$AAPL .           ; => 180.25 USD
-10 USD TO EUR .   ; => 8.61 EUR
+$AAPL .            => 180.25 USD
+10 USD TO EUR .    => 8.61 EUR
 ```
 
 ## 📜 License
