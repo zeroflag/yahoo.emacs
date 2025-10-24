@@ -2,14 +2,7 @@
 
 ![{master}](https://github.com/zeroflag/yahoo.emacs/actions/workflows/ci.yml/badge.svg)
 
-### Examples
-
-```lisp
-(yf-get "QQQ")
-(yf-convert 100 "USD" "EUR")
-```
-
-## 🧭 Overview
+## 📝 Overview
 
 `yf.el` is a DSL and a runtime for Emacs for multi-currency portfolio tracking. It's written in Emacs Lisp, with live price fetching from **Yahoo Finance**, memoized caching, and debug overlays.
 
@@ -55,7 +48,7 @@
         "y s" #'yf-repl-start))
 ```
 
-## 💡 Quick Example
+## 💡 Example
 
 ```Forth
 ( Simple portfolio tracker and F.I.R.E calculator )
