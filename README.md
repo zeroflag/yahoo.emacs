@@ -6,10 +6,46 @@
 
 `yf.el` is a DSL and a runtime for Emacs for multi-currency portfolio tracking. 
 
-It's written in Emacs Lisp, with live price fetching from **Yahoo Finance**, memoized caching, and debug overlays.
-
+It's written in Emacs Lisp, with live price fetching from *Yahoo Finance*, memoized caching, and debug overlays.
 
 <img src="imgs/demo.gif" alt="fib" />
+
+
+
+## 💡 Example
+
+```Forth
+( Simple portfolio tracker and F.I.R.E calculator )
+2500 EUR     CONST MONTHLY
+MONTHLY 12 * CONST EXPENSE ( annual expense )
+
+( Holdings USD )
+$AMZN         50
+$SBUX         300
+$SCHD         2500
+$DIVO         500
+$QQQ          50
+( Holdings EUR )
+$SXR8.DE      750
+$VWCE.DE      1600
+$P911.DE      500
+( Holdings GBP )
+$ULVR.L       250
+
+SUMPROD .S
+
+[ TO EUR SHIFT ] DEPTH 1 - TIMES ( convert all to EUR )
+
+SUM ?
+
+EXPENSE / ANY ?
+
+[ 25 > ] [ "You can retire now." ] [ "Keep working.." ] IF
+.
+
+```
+
+Evaluates your current holdings, converts them into your home currency, and divides by your annual expenses.
 
 ## ⚙️ Installation (Doom Emacs)
 
@@ -51,42 +87,6 @@ It's written in Emacs Lisp, with live price fetching from **Yahoo Finance**, mem
         :desc "Start Yahoo Finace REPL."
         "y s" #'yf-repl-start))
 ```
-
-## 💡 Example
-
-```Forth
-( Simple portfolio tracker and F.I.R.E calculator )
-2500 EUR     CONST MONTHLY
-MONTHLY 12 * CONST EXPENSE ( annual expense )
-
-( Holdings USD )
-$AMZN        50
-$SBUX        300
-$SCHD        2500
-$DIVO        500
-$QQQ         50
-( Holdings EUR )
-$SXR8.DE     750
-$VWCE.DE     1600
-$P911.DE     500
-( Holdings GBP )
-$ULVR.L      250
-
-SUMPROD .S
-
-[ TO EUR SHIFT ] DEPTH 1 - TIMES ( convert all to EUR )
-
-SUM ?
-
-EXPENSE / ANY ?
-
-[ 25 > ] [ "You can retire now." ] [ "Keep working.." ] IF
-.
-
-```
-
-→ Evaluates your current holdings, converts them into your `BASE` currency, and divides by your annual expenses.
-
 
 ## 🔤 Words and Stack Effects
 
