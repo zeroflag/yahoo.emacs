@@ -114,7 +114,7 @@ Below is the current word reference, grouped by category.
 | `WHEN`    | `[cond] [then] →`                       | Executes `then` quotation if `cond` is true   |
 | `FORGE`   | `[quote] name →`                        | Defines a new word (quotation literal)        |
 | `DEPTH`   | `— → n`                                 | Pushes current stack depth                    |
-| `TIMES`   | `n [quote] →`                           | Executes quotation `n` times                  |
+| `TIMES`   | `[quote] n →`                           | Executes quotation `n` times                  |
 
 ---
 
