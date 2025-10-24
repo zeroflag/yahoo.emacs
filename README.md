@@ -104,7 +104,7 @@ Below is the current word reference, grouped by category.
 
 ---
 
-### 🧠 Logic & Control
+### 🧠 Logic, Control & Defining 
 
 | Word      | Stack Effect                            | Description                                   |
 | --------- | --------------------------------------- | --------------------------------------------- |
