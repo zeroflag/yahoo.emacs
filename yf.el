@@ -28,6 +28,8 @@
 (defvar yf-overlays '())
 (defvar yf-overlay-color "green")
 (defvar yf-cache-ttl-sec (* 10 60))
+(defvar yf-number-format "%.2f")
+(defvar yf-small-currency-threshold 0.01)
 
 (defconst yf-default-currency "ANY")
 (defconst yf-ticker-regexp "\\$\\([[:word:].=]+\\)")
@@ -151,7 +153,7 @@
 (fset 'yf-get (yf-memoize #'yf--get))
 
 (defun yf-add-number-grouping (number &optional separator)
-  (let ((num (format "%.2f" number))
+  (let ((num (format yf-number-format number))
         (op (or separator ",")))
     (while (string-match "\\(.*[0-9]\\)\\([0-9][0-9][0-9].*\\)"
                          num)
@@ -186,8 +188,6 @@
    (t
     (format "%s" item))))
 
-;; Exchange rates
-
 (defun yf-xchg-rate (src-currency dst-currency)
   (let* ((ticker (concat src-currency dst-currency "=X"))
          (rate (yf-get ticker)))
@@ -195,14 +195,15 @@
 
 (defun yf-convert (amount src-currency dst-currency)
   "Convert AMOUNT from SRC-CURRENCY to DST-CURRENCY."
-  (interactive)
+  (interactive "nAmount: \nsSource currency: \nsDestination currency: ")
   (if (string= (upcase src-currency)
                (upcase dst-currency))
       amount
     (let ((rate (yf-xchg-rate src-currency dst-currency)))
-      (* rate amount))))
-
-;; Expression evaluator
+      (if (< rate yf-small-currency-threshold)
+          (let ((inverse-rate (yf-xchg-rate dst-currency src-currency)))
+            (/ amount inverse-rate))
+        (* amount rate)))))
 
 (defun yf-is-currency? (token)
   (gethash (upcase token) yf-currency-set))
