@@ -98,7 +98,6 @@ Below is the current word reference, grouped by category.
 | `SWAP` | `a b → b a`     | Swaps top two elements                |
 | `ROT`  | `a b c → b c a` | Rotates top three elements            |
 | `-ROT` | `a b c → c a b` | Inverse rotate                        |
-| `.S`   | `… → …`         | Prints stack contents (for debugging) |
 
 ---
 
@@ -106,10 +105,13 @@ Below is the current word reference, grouped by category.
 
 | Word      | Stack Effect                            | Description                                   |
 | --------- | --------------------------------------- | --------------------------------------------- |
-| `CONST`   | `value name →`                          | Defines a constant word                                             |
-| `SUMPROD` | `— → total`                             | Multiplies each logged holding by its price, sums across currencies |
-| `SUM`     | `list → number`                         | Sums numeric list                                                   |
+| `CONST`   | `value name →`                          | Defines a constant word                       |
+| `SUMPROD` | `— → total`                             | Multiplies each pairs then calculates the sum |
+| `SUM`     | `list → number`                         | Sums all numbers on the stack                 |
 | `WHEN`    | `[cond] [then] →`                       | Executes `then` quotation if `cond` is true   |
+| `UNLESS`  | `[cond] [then] →`                       | Executes [then] if [cond] evaluates false     |
+| `IF`      | `[cond] [then] [else] →`                | Executes [then] if [cond] evaluates false     |
+| `UNTIL`   | `[body] [cond] →`                       | Repeats [body] until [cond] becomes true      |
 | `FORGE`   | `[quote] name →`                        | Defines a new word (quotation literal)        |
 | `DEPTH`   | `— → n`                                 | Pushes current stack depth                    |
 | `TIMES`   | `[quote] n →`                           | Executes quotation `n` times                  |
@@ -118,12 +120,13 @@ Below is the current word reference, grouped by category.
 
 ### 🖨️ Output & Debugging
 
-| Word     | Stack Effect   | Description                                          |
-| ---------| -------------- | ---------------------------------------------------- |
-| `PRINC`  | `string →`     | Prints a string without newline to stdout            |
-| `MESSAGE`| `string →`     | Prints a string without newline to message buffer    |
-| `.`      | `string →`     | Prints the top of the stack as an overlay            |
-| `.S`     | `— →`          | Displays current stack contents as an overlay        |
+| Word     | Stack Effect   | Description                                                  |
+| ---------| -------------- | -------------------------------------------------------------|
+| `PRINC`  | `string →`     | Pops and prints the top of the stack to stdout               |
+| `MESSAGE`| `string →`     | Pops and prints the top of the stack to the message buffer   |
+| `.`      | `x →`          | Pops and displays the top of the stack as an overlay         |
+| `?`      |  x →           | Displays the top of stack as an overlay                      |
+| `.S`     | `— →`          | Displays current stack contents as an overlay                |
 
 ---
 
