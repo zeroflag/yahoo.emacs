@@ -606,6 +606,7 @@
        (t
         (user-error
          "Unkown word: %s at: %d-%d" tok yf-tok-start yf-tok-end)))
+      (yf-debug-message "Stack after eval '%s': (%s)" tok (yf-show-stack))
       (when progress
         (progress-reporter-update progress index)
         (setq index (1+ index))
