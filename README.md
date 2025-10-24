@@ -4,7 +4,9 @@
 
 ## 📝 Overview
 
-`yf.el` is a DSL and a runtime for Emacs for multi-currency portfolio tracking. It's written in Emacs Lisp, with live price fetching from **Yahoo Finance**, memoized caching, and debug overlays.
+`yf.el` is a DSL and a runtime for Emacs for multi-currency portfolio tracking. 
+
+It's written in Emacs Lisp, with live price fetching from **Yahoo Finance**, memoized caching, and debug overlays.
 
 
 ## ⚙️ Installation (Doom Emacs)
