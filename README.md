@@ -23,11 +23,9 @@ Its DSL uses a syntax similar to `Forth` and `Factor`.
 MONTHLY 12 * CONST EXPENSE ( annual expense )
 
 ( Holdings USD )
-$AMZN         50
 $SBUX         300
-$SCHD         2500
-$DIVO         500
-$QQQ          50
+$SCHD         3500
+$QQQ          100
 ( Holdings EUR )
 $SXR8.DE      750
 $VWCE.DE      1600
