@@ -9,6 +9,8 @@
 It's written in Emacs Lisp, with live price fetching from **Yahoo Finance**, memoized caching, and debug overlays.
 
 
+<img src="imgs/demo.gif" alt="fib" />
+
 ## ⚙️ Installation (Doom Emacs)
 
 ### packages.el
