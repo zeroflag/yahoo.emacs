@@ -28,10 +28,8 @@ $SCHD         3500
 $QQQ          100
 ( Holdings EUR )
 $SXR8.DE      750
-$VWCE.DE      1600
-$P911.DE      500
-( Holdings GBP )
-$ULVR.L       250
+$VWCE.DE      1800
+$P911.DE      700
 
 SUMPROD .S
 
@@ -41,9 +39,7 @@ SUM ?
 
 EXPENSE / ANY ?
 
-[ 25 > ] [ "You can retire now." ] [ "Keep working.." ] IF
-.
-
+[ 25 > ] [ "You can retire now." ] [ "Keep working.." ] IF .
 ```
 
 Evaluates your current holdings, converts them into your home currency, and divides by your annual expenses.
