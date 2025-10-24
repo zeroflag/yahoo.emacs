@@ -1,4 +1,4 @@
-# Yahoo Stock Price Package for Emacs
+# yf.el
 
 ![{master}](https://github.com/zeroflag/yahoo.emacs/actions/workflows/ci.yml/badge.svg)
 
