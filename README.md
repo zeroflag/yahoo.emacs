@@ -19,8 +19,7 @@ Its DSL uses a syntax similar to `Forth` and `Factor`.
 
 ```Forth
 ( Simple portfolio tracker and F.I.R.E calculator )
-2500 EUR     CONST MONTHLY
-MONTHLY 12 * CONST EXPENSE ( annual expense )
+2500 EUR 12 * CONST EXPENSE ( annual expense )
 
 ( Holdings USD )
 $SBUX         300
