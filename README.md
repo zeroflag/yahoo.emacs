@@ -55,7 +55,7 @@ It's written in Emacs Lisp, with live price fetching from **Yahoo Finance**, mem
 ```Forth
 ( Simple portfolio tracker and F.I.R.E calculator )
 2500 EUR     CONST MONTHLY
-MONTHLY 12 * CONST EXPENSE
+MONTHLY 12 * CONST EXPENSE ( annual expense )
 
 ( Holdings USD )
 $AMZN        50
