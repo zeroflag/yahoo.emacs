@@ -139,7 +139,8 @@
                    (value (car entry))
                    (timestamp (cdr entry))
                    (now (float-time)))
-              (when (or (not value) (> (- now timestamp) yf-cache-ttl-sec))
+              (when (or (not value)
+                        (> (- now timestamp) yf-cache-ttl-sec))
                 (setq value (apply f args))
                 (yf-debug-message "Saving '%s' => '%s' to cache. TTL=%d"
                                   args

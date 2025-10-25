@@ -90,58 +90,68 @@ Below is the current word reference, grouped by category.
 
 ### 🔧 Core Stack Manipulation
 
-| Word   | Stack Effect    | Description                           |
-| ------ | --------------- | ------------------------------------- |
-| `DROP` | `x →`           | Discards the top of the stack         |
-| `DUP`  | `x → x x`       | Duplicates top element                |
-| `OVER` | `a b → a b a`   | Copies second element to top          |
-| `SWAP` | `a b → b a`     | Swaps top two elements                |
-| `ROT`  | `a b c → b c a` | Rotates top three elements            |
-| `-ROT` | `a b c → c a b` | Inverse rotate                        |
+| Word      | Stack Effect    | Description                                                           |
+| --------- | --------------- | --------------------------------------------------------------------- |
+| `DROP`    | `x →`           | Discards the top of the stack                                         |
+| `DUP`     | `x → x x`       | Duplicates top element                                                |
+| `OVER`    | `a b → a b a`   | Copies second element to top                                          |
+| `SWAP`    | `a b → b a`     | Swaps top two elements                                                |
+| `ROT`     | `a b c → b c a` | Rotates top three elements                                            |
+| `-ROT`    | `a b c → c a b` | Inverse rotate                                                        |
+| `TUCK`    | `a b → c a b`   | Copies the top of the stack and inserts it below the 2nd element      |
+| `CLEAR`   | `... → `        | Clears the stack                                                      |
+| `SHIFT`   | `... a → a ...` | Moves the top of the stack to the bottom                              |
+| `DEPTH`   | `— → n`         | Pushes the current number of items on the stack onto the stack        |
+| `SUMPROD` | `... → total`   | Multiplies each pairs then calculates the sum                         |
+| `SUM`     | `... → number`  | Sums all numbers on the stack                                         |
 
----
+### 🧠 Logic & Control Flow
 
-### 🧠 Logic, Control & Defining 
+| Word      | Stack Effect                 | Description                                   |
+| --------- | -----------------------------| --------------------------------------------- |
+| `[`       | ` → NIL`                     | Startas defining a quotation until `]`        |
+| `WHEN`    | `[cond] [then] →`            | Executes `then` quotation if `cond` is true   |
+| `UNLESS`  | `[cond] [then] →`            | Executes [then] if [cond] evaluates false     |
+| `IF`      | `[cond] [then] [else] →`     | Executes [then] if [cond] evaluates false     |
+| `WHILE`	  | `[cond] [body] →`            | Executes body as long as cond returns true    | 
+| `UNTIL`   | `[body] [cond] →`            | Repeats [body] until [cond] becomes true      |
+| `TIMES`   | `[quote] n →`                | Executes quotation `n` times                  |
+
+```forth
+1 [ DUP 10 < ] [ 1 + ] WHILE
+```
+
+### 🧠 Defining words
 
 | Word      | Stack Effect                            | Description                                   |
 | --------- | --------------------------------------- | --------------------------------------------- |
 | `CONST`   | `value name →`                          | Defines a constant word                       |
-| `SUMPROD` | `— → total`                             | Multiplies each pairs then calculates the sum |
-| `SUM`     | `list → number`                         | Sums all numbers on the stack                 |
-| `WHEN`    | `[cond] [then] →`                       | Executes `then` quotation if `cond` is true   |
-| `UNLESS`  | `[cond] [then] →`                       | Executes [then] if [cond] evaluates false     |
-| `IF`      | `[cond] [then] [else] →`                | Executes [then] if [cond] evaluates false     |
-| `UNTIL`   | `[body] [cond] →`                       | Repeats [body] until [cond] becomes true      |
 | `FORGE`   | `[quote] name →`                        | Defines a new word (quotation literal)        |
-| `DEPTH`   | `— → n`                                 | Pushes current stack depth                    |
-| `TIMES`   | `[quote] n →`                           | Executes quotation `n` times                  |
-
----
 
 ### 🖨️ Output & Debugging
 
 | Word     | Stack Effect   | Description                                                  |
-| ---------| -------------- | -------------------------------------------------------------|
+| ---------| -------------- | ------------------------------------------------------------ |
 | `PRINC`  | `string →`     | Pops and prints the top of the stack to stdout               |
 | `MESSAGE`| `string →`     | Pops and prints the top of the stack to the message buffer   |
 | `.`      | `x →`          | Pops and displays the top of the stack as an overlay         |
 | `?`      |  x →           | Displays the top of stack as an overlay                      |
 | `.S`     | `— →`          | Displays current stack contents as an overlay                |
 
----
-
 ### 🌐 Yahoo Finance Integration
 
-| Word                 | Stack Effect                                | Description                                        |
-| -------------------- | ------------------------------------------- | -------------------------------------------------- |
-| `$TICKER`            | `— → (price . "CUR")`                       | Fetches live Yahoo Finance price for ticker symbol |
-| `TO`                 | `(price . "CUR") → (price . "CUR")`         | Converst from currency1 to currency2               |
+| Word                 | Stack Effect    | Description                                                                             |
+| -------------------- | --------------- | --------------------------------------------------------------------------------------- |
+| `$TICKER`            | `— → n`         | Fetches live Yahoo Finance price for ticker symbol                                      |
+| `TO`                 | `n → n`         | Converts an amount from its source currency to the target currency specified after `TO` |
+| `XCHG`               | `n s → n`       | Sames as `TO` but instead of parsing the target currency it takes it from the stack     |
 
 Examples:
 
 ```Forth
-$AAPL .            => 180.25 USD
-10 USD TO EUR .    => 8.61 EUR
+$AAPL .             => 180.25 USD
+10 USD TO EUR .     => 8.61 EUR
+10 USD "EUR" XCHG . => 8.61 EUR
 ```
 
 ## 📜 License
