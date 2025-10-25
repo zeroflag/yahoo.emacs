@@ -73,7 +73,8 @@ Below is the current word reference, grouped by category.
 
 | Word                 | Stack Effect    | Description                                                                             |
 | -------------------- | --------------- | --------------------------------------------------------------------------------------- |
-| `$TICKER`            | `— → n`         | Fetches live Yahoo Finance price for ticker symbol                                      |
+| `$TICKER`            | `— → n`         | Fetches the price of a literal ticker symbol                                            |
+| `PRICE`              | `s → n`         | Fetches the price of a ticker string                                                    |
 | `TO`                 | `n → n`         | Converts an amount from its source currency to the target currency specified after `TO` |
 | `XCHG`               | `n s → n`       | Sames as `TO` but instead of parsing the target currency it takes it from the stack     |
 
@@ -143,10 +144,10 @@ Examples:
 
 ### 👷 Defining words
 
-| Word      | Stack Effect                          | Description                                                                    |
-| --------- | ------------------------------------- | ------------------------------------------------------------------------------ |
-| `SET`     | `value →`                             | Defines a variable with the name specified after `SET`                         |
-| `FORGE`   | `[quote] →`                           | Defines a new with the quotation as body, and the name specified after `FORGE` |
+| Word      | Stack Effect                          | Description                                                                     |
+| --------- | ------------------------------------- | ---------------------------------------------------------------- -------------- |
+| `SET`     | `value →`                             | Defines a variable with the name specified after `SET`                          |
+| `FORGE`   | `[quote] →`                           | Defines a word with the quotation as body, and the name specified after `FORGE` |
 
 Examples
 ```forth
