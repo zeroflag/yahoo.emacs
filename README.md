@@ -170,19 +170,20 @@ Examples:
 Examples
 ```forth
 3.14 CONST PI
+
 [ 1 + ] FORGE INC
 
-12 INC        => 13
+PI INC        => 4.14
 ```
 
 ### 🖨️ Output & Debugging
 
 | Word     | Stack Effect   | Description                                                   |
 | ---------| -------------- | ------------------------------------------------------------- |
-| `PRINC`  | `string →`     | Pops and prints the top of the stack to stdout                |
-| `MESSAGE`| `string →`     | Pops and prints the top of the stack to the message buffer    |
+| `PRINC`  | `x →`          | Pops and prints the top of the stack to stdout                |
+| `MESSAGE`| `x →`          | Pops and prints the top of the stack to the message buffer    |
 | `.`      | `x →`          | Pops and displays the top of the stack as an overlay          |
-| `?`      |  x →           | Displays the top of stack (without removing it) as an overlay |
+| `?`      | `x →`          | Displays the top of stack (without removing it) as an overlay |
 | `.S`     | `— →`          | Displays current stack contents as an overlay                 |
 
 ## 📜 License
