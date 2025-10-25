@@ -208,7 +208,6 @@
    269696 =
  ] UNTIL") '((25264 . "ANY"))))
 
-
 (ert-deftest yf-str-test ()
   (should (equal (eval1 "\"Hello World !\"") '("Hello World !"))))
 
