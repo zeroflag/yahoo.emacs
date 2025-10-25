@@ -47,13 +47,13 @@ Evaluates your current holdings, converts them into your home currency, and divi
 
 ### packages.el
 
-```lisp
+```elisp
 (package! yf
   :recipe (:host github :repo "zeroflag/yahoo.emacs"))
 ```
 
 ### config.el
-```
+```elisp
 (use-package! yf-mode :mode "\\.yf" :defer t)
 
 (use-package! yf-repl
