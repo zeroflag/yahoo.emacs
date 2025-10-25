@@ -58,13 +58,13 @@ Evaluates your current holdings, converts them into your home currency, and divi
 (use-package! yf-mode
   :mode "\\.yf"
   :defer t
-  :commands (yf-eval-current-line
+  :commands (yf-eval-line
              yf-eval-buffer
              yf-delete-overlays)
   :init
   (map! :leader
         :desc "Eval line as yf code."
-        "y e" #'yf-eval-current-line)
+        "y e" #'yf-eval-line)
   (map! :leader
         :desc "Eval buffer as yf code."
         "y b" #'yf-eval-buffer)

@@ -624,7 +624,7 @@
   (yf-clear)
   (yf-forget))
 
-(defun yf-eval-current-line ()
+(defun yf-eval-line ()
   "Read and eval current line as YF code."
   (interactive)
   (yf-clean-state)
