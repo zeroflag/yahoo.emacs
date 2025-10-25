@@ -117,11 +117,13 @@ Below is the current word reference, grouped by category.
 | `UNTIL`   | `[body] [cond] →`            | Repeats [body] until [cond] becomes true      |
 | `TIMES`   | `[quote] n →`                | Executes quotation `n` times                  |
 
+Examples:
+
 ```forth
 1 [ DUP 10 < ] [ 1 + ] WHILE
 ```
 
-### 🧠 Defining words
+### 👷 Defining words
 
 | Word      | Stack Effect                            | Description                                   |
 | --------- | --------------------------------------- | --------------------------------------------- |
