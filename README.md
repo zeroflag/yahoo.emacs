@@ -88,65 +88,6 @@ Evaluates your current holdings, converts them into your home currency, and divi
 
 Below is the current word reference, grouped by category.
 
-### 🔧 Core Stack Manipulation
-
-| Word      | Stack Effect    | Description                                                           |
-| --------- | --------------- | --------------------------------------------------------------------- |
-| `DROP`    | `x →`           | Discards the top of the stack                                         |
-| `DUP`     | `x → x x`       | Duplicates top element                                                |
-| `OVER`    | `a b → a b a`   | Copies second element to top                                          |
-| `SWAP`    | `a b → b a`     | Swaps top two elements                                                |
-| `ROT`     | `a b c → b c a` | Rotates top three elements                                            |
-| `-ROT`    | `a b c → c a b` | Inverse rotate                                                        |
-| `TUCK`    | `a b → c a b`   | Copies the top of the stack and inserts it below the 2nd element      |
-| `CLEAR`   | `... → `        | Clears the stack                                                      |
-| `SHIFT`   | `... a → a ...` | Moves the top of the stack to the bottom                              |
-| `DEPTH`   | `— → n`         | Pushes the current number of items on the stack onto the stack        |
-| `SUMPROD` | `... → total`   | Multiplies each pairs then calculates the sum                         |
-| `SUM`     | `... → number`  | Sums all numbers on the stack                                         |
-
-### 🧠 Logic & Control Flow
-
-| Word      | Stack Effect                 | Description                                   |
-| --------- | -----------------------------| --------------------------------------------- |
-| `[`       | ` → NIL`                     | Startas defining a quotation until `]`        |
-| `WHEN`    | `[cond] [then] →`            | Executes `then` quotation if `cond` is true   |
-| `UNLESS`  | `[cond] [then] →`            | Executes [then] if [cond] evaluates false     |
-| `IF`      | `[cond] [then] [else] →`     | Executes [then] if [cond] evaluates false     |
-| `WHILE`	  | `[cond] [body] →`            | Executes body as long as cond returns true    | 
-| `UNTIL`   | `[body] [cond] →`            | Repeats [body] until [cond] becomes true      |
-| `TIMES`   | `[quote] n →`                | Executes quotation `n` times                  |
-
-Examples:
-
-```forth
-1 [ DUP 10 < ] [ 1 + ] WHILE
-[ TO EUR SHIFT ] DEPTH 1 - TIMES ( convert all items on the stack to EUR )
-```
-
-### 👷 Defining words
-
-| Word      | Stack Effect                            | Description                                                                    |
-| --------- | --------------------------------------- | ------------------------------------------------------------------------------ |
-| `CONST`   | `value →`                               | Defines a constant with the name specified after `CONST`                       |
-| `FORGE`   | `[quote] →`                             | Defines a new with the quotation as body, and the name specified after `FORGE` |
-
-Examples
-```forth
-3.14 CONST PI
-[ 1 + ] FORGE INC
-```
-
-### 🖨️ Output & Debugging
-
-| Word     | Stack Effect   | Description                                                  |
-| ---------| -------------- | ------------------------------------------------------------ |
-| `PRINC`  | `string →`     | Pops and prints the top of the stack to stdout               |
-| `MESSAGE`| `string →`     | Pops and prints the top of the stack to the message buffer   |
-| `.`      | `x →`          | Pops and displays the top of the stack as an overlay         |
-| `?`      |  x →           | Displays the top of stack as an overlay                      |
-| `.S`     | `— →`          | Displays current stack contents as an overlay                |
-
 ### 🌐 Yahoo Finance Integration
 
 | Word                 | Stack Effect    | Description                                                                             |
@@ -162,6 +103,78 @@ $AAPL .             => 180.25 USD
 10 USD TO EUR .     => 8.61 EUR
 10 USD "EUR" XCHG . => 8.61 EUR
 ```
+
+All numbers are represented as dotted pairs in the form `(amount . CURRENCY)`, for example `(100.0 . "USD")`.
+If no currency is specified, "ANY" is used by default.
+Arithmetic operations can be performed between numbers that share the same currency, or when one of them has the "ANY" currency.
+
+### 🔧 Core Stack Manipulation
+
+| Word      | Stack Effect    | Description                                                           |
+| --------- | --------------- | --------------------------------------------------------------------- |
+| `DROP`    | `x →`           | Discards the top of the stack                                         |
+| `DUP`     | `x → x x`       | Duplicates top element                                                |
+| `OVER`    | `a b → a b a`   | Copies second element to top                                          |
+| `SWAP`    | `a b → b a`     | Swaps top two elements                                                |
+| `ROT`     | `a b c → b c a` | Rotates top three elements                                            |
+| `-ROT`    | `a b c → c a b` | Inverse rotate                                                        |
+| `TUCK`    | `a b → c a b`   | Copies the top of the stack and inserts it below the 2nd element      |
+| `CLEAR`   | `... → `        | Clears the stack                                                      |
+| `SHIFT`   | `... a → a ...` | Moves the top of the stack to the bottom                              |
+| `DEPTH`   | `— → n`         | Pushes the current number of items on the stack onto the stack        |
+| `SUMPROD` | `... → total`   | Multiplies each pairs then calculates the sum                         |
+| `SUM`     | `... → total`   | Sums all numbers on the stack                                         |
+
+### 🧠 Logic & Control Flow
+
+| Word      | Stack Effect                 | Description                                   |
+| --------- | -----------------------------| --------------------------------------------- |
+| `[`       | ` → NIL`                     | Startas defining a quotation until `]`        |
+| `WHEN`    | `[cond] [then] →`            | Executes `then` quotation if `cond` is true   |
+| `UNLESS`  | `[cond] [then] →`            | Executes `then` if `cond` evaluates false     |
+| `IF`      | `[cond] [then] [else] →`     | Executes `then` if `cond` evaluates true      |
+| `WHILE`	  | `[cond] [body] →`            | Executes `body` as long as `cond` is true     | 
+| `UNTIL`   | `[body] [cond] →`            | Repeats `body` until `cond` becomes true      |
+| `TIMES`   | `[quote] n →`                | Executes quotation `n` times                  |
+| `CALL`    | `[quote] →`                  | Executes quotation                            |
+
+Examples:
+
+```forth
+1 [ DUP 10 < ] [ 1 + ] WHILE
+
+( convert all items on the stack to EUR )
+[ TO EUR SHIFT ] DEPTH 1 - TIMES 
+
+( select the minimum )
+2 3 [ OVER OVER < ] [ DROP ] [ SWAP DROP ] IF
+
+```
+
+### 👷 Defining words
+
+| Word      | Stack Effect                            | Description                                                                    |
+| --------- | --------------------------------------- | ------------------------------------------------------------------------------ |
+| `CONST`   | `value →`                               | Defines a constant with the name specified after `CONST`                       |
+| `FORGE`   | `[quote] →`                             | Defines a new with the quotation as body, and the name specified after `FORGE` |
+
+Examples
+```forth
+3.14 CONST PI
+[ 1 + ] FORGE INC
+
+12 INC        => 13
+```
+
+### 🖨️ Output & Debugging
+
+| Word     | Stack Effect   | Description                                                   |
+| ---------| -------------- | ------------------------------------------------------------- |
+| `PRINC`  | `string →`     | Pops and prints the top of the stack to stdout                |
+| `MESSAGE`| `string →`     | Pops and prints the top of the stack to the message buffer    |
+| `.`      | `x →`          | Pops and displays the top of the stack as an overlay          |
+| `?`      |  x →           | Displays the top of stack (without removing it) as an overlay |
+| `.S`     | `— →`          | Displays current stack contents as an overlay                 |
 
 ## 📜 License
 
