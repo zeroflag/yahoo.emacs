@@ -53,6 +53,7 @@ Evaluates your current holdings, converts them into your home currency, and divi
 ```
 
 ### config.el
+```
 (use-package! yf-mode :mode "\\.yf" :defer t)
 
 (use-package! yf-repl
