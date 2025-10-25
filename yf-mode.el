@@ -13,6 +13,14 @@
 ;;;
 (require 'yf)
 
+(defvar yf-mode-key-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-r") 'yf-eval-region)
+    (define-key map (kbd "C-c C-e") 'yf-eval-line)
+    (define-key map (kbd "C-c C-b") 'yf-eval-buffer)
+    map)
+  "Key map for YF majod mode.")
+
 (defvar yf-mode-syntax-table
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?\( "<" st)
@@ -49,6 +57,7 @@
 (define-derived-mode yf-mode prog-mode "YF"
   "Major mode for .yf files."
   :syntax-table yf-mode-syntax-table
+  :keymap yf-mode-key-map
   (setq-local font-lock-defaults `(,yf-font-lock-defaults))
   (setq-local completion-at-point-functions '(yf-mode-completion t))
   (setq-local comment-start "(")
