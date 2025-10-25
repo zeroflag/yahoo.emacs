@@ -145,7 +145,7 @@ Examples:
 ### 👷 Defining words
 
 | Word      | Stack Effect                          | Description                                                                     |
-| --------- | ------------------------------------- | ---------------------------------------------------------------- -------------- |
+| --------- | ------------------------------------- | ------------------------------------------------------------------------------- |
 | `SET`     | `value →`                             | Defines a variable with the name specified after `SET`                          |
 | `FORGE`   | `[quote] →`                           | Defines a word with the quotation as body, and the name specified after `FORGE` |
 
