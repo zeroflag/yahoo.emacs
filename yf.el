@@ -500,7 +500,7 @@
            (let ((currency (yf-tok _tcell)))
              (yf-push (yf-to (yf-pop) currency)))
            (yf-next _tcell))
-  (yf-defp "CONST"
+  (yf-defp "SET"
            (let ((name (yf-tok _tcell))
                  (val (yf-pop)))
              (yf-def name (yf-push val))
@@ -568,8 +568,8 @@
 
 (defun yf-eval (text &optional offset)
   (interactive)
-  (when (zerop (hash-table-count yf-dict))
-    (yf-define-built-ins))
+  ;; (when (zerop (hash-table-count yf-dict))
+    (yf-define-built-ins)
   (yf--eval (list (yf-parse text)) offset))
 
 (defun yf--eval (tcell &optional offset disable-progress)

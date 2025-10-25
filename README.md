@@ -19,7 +19,7 @@ Its DSL uses a syntax similar to `Forth` and `Factor`.
 
 ```Forth
 ( Simple portfolio tracker and F.I.R.E calculator )
-2500 EUR 12 * CONST EXPENSE ( annual expense )
+2500 EUR 12 * SET EXPENSE ( annual expense )
 
 ( Holdings USD )
 $SBUX         300
@@ -143,14 +143,14 @@ Examples:
 
 ### 👷 Defining words
 
-| Word      | Stack Effect                            | Description                                                                    |
-| --------- | --------------------------------------- | ------------------------------------------------------------------------------ |
-| `CONST`   | `value →`                               | Defines a constant with the name specified after `CONST`                       |
-| `FORGE`   | `[quote] →`                             | Defines a new with the quotation as body, and the name specified after `FORGE` |
+| Word      | Stack Effect                          | Description                                                                    |
+| --------- | ------------------------------------- | ------------------------------------------------------------------------------ |
+| `SET`     | `value →`                             | Defines a variable with the name specified after `SET`                         |
+| `FORGE`   | `[quote] →`                           | Defines a new with the quotation as body, and the name specified after `FORGE` |
 
 Examples
 ```forth
-3.14 CONST PI
+3.14 SET PI
 
 [ 1 + ] FORGE INC
 
