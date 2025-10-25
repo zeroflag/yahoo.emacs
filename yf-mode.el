@@ -18,6 +18,7 @@
     (define-key map (kbd "C-c C-e") 'yf-eval-line)
     (define-key map (kbd "C-c C-r") 'yf-eval-region)
     (define-key map (kbd "C-c C-b") 'yf-eval-buffer)
+    (define-key map (kbd "C-c C-d") 'yf-delete-overlays)
     map)
   "Key map for YF majod mode.")
 

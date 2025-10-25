@@ -53,27 +53,7 @@ Evaluates your current holdings, converts them into your home currency, and divi
 ```
 
 ### config.el
-
-```lisp
-(use-package! yf-mode
-  :mode "\\.yf"
-  :defer t
-  :commands (yf-eval-line
-             yf-eval-buffer
-             yf-delete-overlays)
-  :init
-  (map! :leader
-        :desc "Eval line as yf code."
-        "y e" #'yf-eval-line)
-  (map! :leader
-        :desc "Eval buffer as yf code."
-        "y b" #'yf-eval-buffer)
-  (map! :leader
-        :desc "Eval region as yf code."
-        "y r" #'yf-eval-region)
-  (map! :leader
-        :desc "Delete all overlays created by yf."
-        "y d" #'yf-delete-overlays))
+(use-package! yf-mode :mode "\\.yf" :defer t)
 
 (use-package! yf-repl
   :defer t
