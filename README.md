@@ -121,14 +121,21 @@ Examples:
 
 ```forth
 1 [ DUP 10 < ] [ 1 + ] WHILE
+[ TO EUR SHIFT ] DEPTH 1 - TIMES ( convert all items on the stack to EUR )
 ```
 
 ### 👷 Defining words
 
-| Word      | Stack Effect                            | Description                                   |
-| --------- | --------------------------------------- | --------------------------------------------- |
-| `CONST`   | `value name →`                          | Defines a constant word                       |
-| `FORGE`   | `[quote] name →`                        | Defines a new word (quotation literal)        |
+| Word      | Stack Effect                            | Description                                                                    |
+| --------- | --------------------------------------- | ------------------------------------------------------------------------------ |
+| `CONST`   | `value →`                               | Defines a constant with the name specified after `CONST`                       |
+| `FORGE`   | `[quote] →`                             | Defines a new with the quotation as body, and the name specified after `FORGE` |
+
+Examples
+```forth
+3.14 CONST PI
+[ 1 + ] FORGE INC
+```
 
 ### 🖨️ Output & Debugging
 
