@@ -105,8 +105,8 @@ $AAPL .             => 180.25 USD
 ```
 
 All numbers are represented as dotted pairs in the form `(amount . CURRENCY)`, for example `(100.0 . "USD")`.
-If no currency is specified, "ANY" is used by default.
-Arithmetic operations can be performed between numbers that share the same currency, or when one of them has the "ANY" currency.
+If no currency is specified, `"ANY"` is used by default.
+Arithmetic operations can be performed between numbers that share the same currency, or when one of them has the `"ANY"` currency.
 
 ### 🔧 Core Stack Manipulation
 
@@ -124,6 +124,15 @@ Arithmetic operations can be performed between numbers that share the same curre
 | `DEPTH`   | `— → n`         | Pushes the current number of items on the stack onto the stack        |
 | `SUMPROD` | `... → total`   | Multiplies each pairs then calculates the sum                         |
 | `SUM`     | `... → total`   | Sums all numbers on the stack                                         |
+
+
+```forth
+100   $SBUX
+250   $QQQ
+500   $SPY
+
+SUMPROD .
+```
 
 ### 🧠 Logic & Control Flow
 
