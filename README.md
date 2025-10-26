@@ -92,20 +92,21 @@ Arithmetic operations can be performed between numbers that share the same curre
 
 ### 🔧 Core Stack Manipulation
 
-| Word      | Stack Effect    | Description                                                           |
-| --------- | --------------- | --------------------------------------------------------------------- |
-| `DROP`    | `x →`           | Discards the top of the stack                                         |
-| `DUP`     | `x → x x`       | Duplicates top element                                                |
-| `OVER`    | `a b → a b a`   | Copies second element to top                                          |
-| `SWAP`    | `a b → b a`     | Swaps top two elements                                                |
-| `ROT`     | `a b c → b c a` | Rotates top three elements                                            |
-| `-ROT`    | `a b c → c a b` | Inverse rotate                                                        |
-| `TUCK`    | `a b → c a b`   | Copies the top of the stack and inserts it below the 2nd element      |
-| `CLEAR`   | `... → `        | Clears the stack                                                      |
-| `SHIFT`   | `... a → a ...` | Moves the top of the stack to the bottom                              |
-| `DEPTH`   | `— → n`         | Pushes the current number of items on the stack onto the stack        |
-| `SUMPROD` | `... → total`   | Multiplies each pairs then calculates the sum                         |
-| `SUM`     | `... → total`   | Sums all numbers on the stack                                         |
+| Word          | Stack Effect    | Description                                                           |
+| ------------- | --------------- | --------------------------------------------------------------------- |
+| `DROP`        | `x →`           | Discards the top of the stack                                         |
+| `DUP`         | `x → x x`       | Duplicates top element                                                |
+| `OVER`        | `a b → a b a`   | Copies second element to top                                          |
+| `SWAP`        | `a b → b a`     | Swaps top two elements                                                |
+| `ROT`         | `a b c → b c a` | Rotates top three elements                                            |
+| `-ROT`        | `a b c → c a b` | Inverse rotate                                                        |
+| `TUCK`        | `a b → c a b`   | Copies the top of the stack and inserts it below the 2nd element      |
+| `CLEAR`       | `... → `        | Clears the stack                                                      |
+| `SHIFT`       | `... a → a ...` | Moves the top of the stack to the bottom                              |
+| `DEPTH`       | `— → n`         | Pushes the current number of items on the stack onto the stack        |
+| `SUMPROD`     | `... → total`   | Multiplies each pairs then calculates the sum                         |
+| `SUM`         | `... → total`   | Sums all numbers on the stack                                         |
+| `WALL` or `|` | `— → |`         | Stack boundary marker used by `SUM`/`SUMPROD` to limit their operation|
 
 
 ```forth
@@ -114,6 +115,10 @@ Arithmetic operations can be performed between numbers that share the same curre
 500   $SPY
 
 SUMPROD .
+```
+
+```forth
+1 2 3 | 4 5 SUM .  => 9
 ```
 
 ### 🧠 Logic & Control Flow

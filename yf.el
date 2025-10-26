@@ -420,8 +420,7 @@
     (if (= 0 yf-quotation-cnt)
         (setq yf-mode 'interpret)
       (yf-add-to-quotation tok start end)))
-   ((string= "[" tok)
-                                        ; nested quotation
+   ((string= "[" tok) ; nested quotation
     (setq yf-quotation-cnt (1+ yf-quotation-cnt))
     (yf-add-to-quotation tok start end))
    (t ; normal token
