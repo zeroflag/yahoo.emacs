@@ -90,6 +90,15 @@
   (should (yf-currency-sets-equal (eval1 "1 GBP 5 USD 8 HUF 10 EUR 20 EUR 30 EUR sum")
                  '((60 . "EUR") (8 . "HUF") (5 . "USD") (1 . "GBP")))))
 
+(ert-deftest yf-wall-sum-test ()
+  (should (equal (eval1 "wall sum") '()))
+  (should (equal (eval1 "wall 10 sum") '((10 . "ANY"))))
+  (should (equal (eval1 "5 wall 10 sum") '((10 . "ANY") (5 . "ANY"))))
+  (should (equal (eval1 "5 7 8 wall 1 2 3 sum")
+                 '((6 . "ANY") (8 . "ANY") (7 . "ANY") (5 . "ANY"))))
+  (should (equal (eval1 "5 7 8 wall 1 2 3 sum sum") '((26 . "ANY"))))
+  (should (equal (eval1 "4 wall 5 7 8 wall 1 2 3 sum sum sum") '((30 . "ANY")))))
+
 (ert-deftest yf-stack-test ()
   (should (equal (eval1 "4 dup")
                  '((4 . "ANY") (4 . "ANY"))))

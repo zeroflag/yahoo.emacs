@@ -186,6 +186,8 @@
     (concat "[ "
             (substring (format "%s" (reverse item)) 1 -1)
             " ]"))
+   ((eq item 'WALL)
+    "WALL")
    (t
     (format "%s" item))))
 
@@ -220,12 +222,26 @@
   (unless (yf-currency-match a b)
     (user-error "Currency mismatch %s - %s" a b)))
 
+(defun yf-split-at-wall (lst)
+  "Split LST into two lists at 'WALL', excluding the marker."
+  (let (before after seen-wall)
+    (dolist (x lst)
+      (if seen-wall
+          (push x after)
+        (if (eq x 'WALL)
+            (setq seen-wall t)
+          (push x before))))
+    (cons (nreverse before) (nreverse after))))
+
 (defun yf-sum-currency-groups (xs)
   "Sum a list of (amount . currency) pairs by currency."
-  (let ((table (make-hash-table :test #'equal)))
-    (dolist (pair xs)
-      (let* ((amount (car pair))
-             (currency (cdr pair))
+  (let* ((split (yf-split-at-wall xs))
+         (before (car split))
+         (after (cdr split))
+         (table (make-hash-table :test #'equal)))
+    (dolist (money before)
+      (let* ((amount (car money))
+             (currency (cdr money))
              (current (gethash currency table 0)))
         (puthash currency (+ amount current) table)))
     ;; Transform back to list
@@ -233,7 +249,7 @@
       (maphash (lambda (currency amount)
                  (push (cons amount currency) result))
                table)
-      result)))
+      (append result after))))
 
 (defun yf-pick-currency (a b)
   (let ((c1 (cdr a))
@@ -455,6 +471,7 @@
   (yf-def "SUMPROD"
           (setq yf-stack (yf-prod-pairs yf-stack))
           (setq yf-stack (yf-sum-currency-groups yf-stack)))
+  (yf-def "WALL" (yf-push 'WALL))
   (yf-def "SWAP"
           (let ((a (yf-pop))
                 (b (yf-pop)))
@@ -568,8 +585,8 @@
 
 (defun yf-eval (text &optional offset)
   (interactive)
-  ;; (when (zerop (hash-table-count yf-dict))
-    (yf-define-built-ins)
+  (when (zerop (hash-table-count yf-dict))
+    (yf-define-built-ins))
   (yf--eval (list (yf-parse text)) offset))
 
 (defun yf--eval (tcell &optional offset disable-progress)
