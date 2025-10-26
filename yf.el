@@ -580,6 +580,8 @@
             (dotimes (_ count)
               (yf-callq code))))
   (yf-def "WORDS" (yf-print-overlay (yf-words)))
+  ;; aliases
+  (puthash "|" (gethash "WALL" yf-dict) yf-dict)
   (setq yf-tok-start 0)
   (setq yf-tok-end 0))
 
