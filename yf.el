@@ -187,7 +187,7 @@
             (substring (format "%s" (reverse item)) 1 -1)
             " ]"))
    ((eq item 'WALL)
-    "WALL")
+    "|")
    (t
     (format "%s" item))))
 

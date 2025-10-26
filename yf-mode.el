@@ -43,7 +43,7 @@
         (list start end all)))))
 
 (defconst yf-builtin-symbols
-  '("+" "-" "*" "/" "?" "." ".s"))
+  '("+" "-" "*" "/" "?" "." ".s" "|"))
 
 (defvar yf-font-lock-defaults
   `((,(regexp-opt yf-currency-codes 'words) . font-lock-keyword-face)
