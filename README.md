@@ -106,7 +106,7 @@ Arithmetic operations can be performed between numbers that share the same curre
 | `DEPTH`       | `— → n`         | Pushes the current number of items on the stack onto the stack        |
 | `SUMPROD`     | `... → total`   | Multiplies each pairs then calculates the sum                         |
 | `SUM`         | `... → total`   | Sums all numbers on the stack                                         |
-| `WALL` or `|` | `— → |`         | Stack boundary marker used by `SUM`/`SUMPROD` to limit their operation|
+| `WALL` / `\|` | `— → |`         | Stack boundary marker used by `SUM`/`SUMPROD` to limit their operation|
 
 
 ```forth
