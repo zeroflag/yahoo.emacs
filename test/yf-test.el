@@ -99,6 +99,17 @@
   (should (equal (eval1 "5 7 8 wall 1 2 3 sum sum") '((26 . "ANY"))))
   (should (equal (eval1 "4 wall 5 7 8 wall 1 2 3 sum sum sum") '((30 . "ANY")))))
 
+(ert-deftest yf-wall-sumprod-test ()
+  (should (equal (eval1 "wall sumprod") '()))
+  (should (equal (eval1 "wall 10 sumprod") '((10 . "ANY"))))
+  (should (equal (eval1 "wall 10 20 sumprod") '((200 . "ANY"))))
+  (should (equal (eval1 "wall 2 2 3 3 sumprod") '((13 . "ANY"))))
+  (should (equal (eval1 "4 4 5 5 wall 2 2 3 3 sumprod")
+                 '((13 . "ANY") (5 . "ANY") (5 . "ANY") (4 . "ANY") (4 . "ANY"))))
+  (should (equal (eval1 "5 5 13 wall 2 2 3 3 sumprod sumprod") '((194 . "ANY"))))
+  (should (equal (eval1 "2 3 4 wall 5 5 13 wall 2 2 3 3 sumprod sumprod sumprod")
+                 '((782 . "ANY")))))
+
 (ert-deftest yf-stack-test ()
   (should (equal (eval1 "4 dup")
                  '((4 . "ANY") (4 . "ANY"))))

@@ -469,8 +469,12 @@
   (yf-def "NIL" (yf-push nil))
   (yf-def "SUM" (setq yf-stack (yf-sum-currency-groups yf-stack)))
   (yf-def "SUMPROD"
-          (setq yf-stack (yf-prod-pairs yf-stack))
-          (setq yf-stack (yf-sum-currency-groups yf-stack)))
+          (let* ((split (yf-split-at-wall yf-stack))
+                 (before (car split))
+                 (after (cdr split))
+                 (prods (yf-prod-pairs before))
+                 (sums (yf-sum-currency-groups prods)))
+            (setq yf-stack (append sums after))))
   (yf-def "WALL" (yf-push 'WALL))
   (yf-def "SWAP"
           (let ((a (yf-pop))
@@ -534,9 +538,9 @@
              (yf-next _tcell))
            (yf-next _tcell))
   (yf-def "["
-           (setq yf-mode 'quotation)
-           (setq yf-quotation-cnt 1)
-           (yf-push nil)) ; list to collect quotation items
+          (setq yf-mode 'quotation)
+          (setq yf-quotation-cnt 1)
+          (yf-push nil)) ; list to collect quotation items
   (yf-def "WHEN"
           (let ((body (yf-pop))
                 (cond (yf-pop)))
