@@ -90,7 +90,7 @@ All numbers are represented as dotted pairs in the form `(amount . CURRENCY)`, f
 If no currency is specified, `"ANY"` is used by default.
 Arithmetic operations can be performed between numbers that share the same currency, or when one of them has the `"ANY"` currency.
 
-### 🔧 Core Stack Manipulation
+### 🔧 Core Stack Manipulation & Arithmetic Words
 
 | Word          | Stack Effect    | Description                                                           |
 | ------------- | --------------- | --------------------------------------------------------------------- |
@@ -104,9 +104,15 @@ Arithmetic operations can be performed between numbers that share the same curre
 | `CLEAR`       | `... → `        | Clears the stack                                                      |
 | `SHIFT`       | `... a → a ...` | Moves the top of the stack to the bottom                              |
 | `DEPTH`       | `— → n`         | Pushes the current number of items on the stack onto the stack        |
+| `+`           | `n1 n2 → n`     | Adds n1 and n2 together                                               |
+| `-`           | `n1 n2 → n`     | Subtracts n2 from n1                                                  |
+| `*`           | `n1 n2 → n`     | Multiplies n1 with n2                                                 |
+| `/`           | `n1 n2 → n`     | Divides n1 by n2                                                      |
+| `DIV`         | `n1 n2 → n`     | Integer division between n1 and n2                                    |
+| `MOD`         | `n1 n2 → nl`    | Modulo division between n2 and n2                                     |
 | `SUMPROD`     | `... → total`   | Multiplies each pairs then calculates the sum                         |
 | `SUM`         | `... → total`   | Sums all numbers on the stack                                         |
-| `WALL` / `\|` | `— → \|`         | Stack boundary marker used by `SUM`/`SUMPROD` to limit their operation|
+| `WALL` / `\|` | `— → \|`        | Stack boundary marker used by `SUM`/`SUMPROD` to limit their operation|
 
 
 ```forth
@@ -133,6 +139,8 @@ SUMPROD .
 | `UNTIL`   | `[body] [cond] →`            | Repeats `body` until `cond` becomes true      |
 | `TIMES`   | `[quote] n →`                | Executes quotation `n` times                  |
 | `CALL`    | `[quote] →`                  | Executes quotation                            |
+| `AND`     | `b1 b2 → b`                  | Logical AND                                   |
+| `OR`      | `b1 b2 → b`                  | Logical OR                                    |
 
 Examples:
 
