@@ -104,6 +104,7 @@ Arithmetic operations can be performed between numbers that share the same curre
 | `CLEAR`       | `... → `        | Clears the stack                                                      |
 | `SHIFT`       | `... a → a ...` | Moves the top of the stack to the bottom                              |
 | `DEPTH`       | `— → n`         | Pushes the current number of items on the stack onto the stack        |
+| `TALLY`       | `— → n`         | Pushes the current number of items on the stack until the next WALL   |
 | `+`           | `n1 n2 → n`     | Adds n1 and n2 together                                               |
 | `-`           | `n1 n2 → n`     | Subtracts n2 from n1                                                  |
 | `*`           | `n1 n2 → n`     | Multiplies n1 with n2                                                 |
@@ -125,6 +126,11 @@ SUMPROD .
 
 ```forth
 1 2 3 | 4 5 SUM .  => 9
+```
+
+```forth
+1 2 3 | 4 5 TALLY .  => 2
+1 2 3 | 4 5 DEPTH .  => 6
 ```
 
 ### 🧠 Logic & Control Flow

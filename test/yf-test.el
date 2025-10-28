@@ -238,6 +238,20 @@
 (ert-deftest yf-nil-test ()
   (should (equal (eval1 "nil") '(nil))))
 
+(ert-deftest yf-depth-test ()
+  (should (equal (eval1 "DEPTH") '((0 . "ANY"))))
+  (should (equal (eval1 "10 DEPTH") '((1 . "ANY") (10 . "ANY"))))
+  (should (equal (eval1 "10 20 DEPTH") '((2 . "ANY") (20 . "ANY") (10 . "ANY")))))
+
+(ert-deftest yf-tally-test ()
+  (should (equal (eval1 "TALLY") '((0 . "ANY"))))
+  (should (equal (eval1 "10 TALLY") '((1 . "ANY") (10 . "ANY"))))
+  (should (equal (eval1 "10 20 TALLY") '((2 . "ANY") (20 . "ANY") (10 . "ANY"))))
+  (should (equal (eval1 "| TALLY") '((0 . "ANY") WALL)))
+  (should (equal (eval1 "| 10 TALLY") '((1 . "ANY") (10 . "ANY") WALL)))
+  (should (equal (eval1 "20 30 40 | 10 TALLY")
+                 '((1 . "ANY") (10 . "ANY") WALL (40 . "ANY") (30 . "ANY") (20 . "ANY")))))
+
 (ert-deftest yf-forge-test ()
   (eval1 "[ 1 + ] FORGE INC")
   (eval1 "[ DUP * ] FORGE SQUARE")

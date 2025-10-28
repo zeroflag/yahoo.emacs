@@ -222,6 +222,16 @@
   (unless (yf-currency-match a b)
     (user-error "Currency mismatch %s - %s" a b)))
 
+(defun yf-tally (xs)
+  (let ((count 0)
+        (done nil))
+    (while (and xs (not done))
+      (if (eq (car xs) 'WALL)
+          (setq done t)
+        (setq count (1+ count)))
+      (setq xs (cdr xs)))
+    count))
+
 (defun yf-split-at-wall (lst)
   "Split LST into two lists at 'WALL', excluding the marker."
   (let (before after seen-wall)
@@ -509,6 +519,8 @@
   (yf-def "CLEAR" (yf-clear))
   (yf-def "DEPTH"
           (yf-push (cons (length yf-stack) yf-default-currency)))
+  (yf-def "TALLY"
+          (yf-push (cons (yf-tally yf-stack) yf-default-currency)))
   (yf-def "PRICE"
           (let ((ticker (yf-pop)))
             (yf-push (yf-get ticker))))
