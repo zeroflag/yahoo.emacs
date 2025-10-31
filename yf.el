@@ -590,7 +590,9 @@
                 (code (yf-pop)))
             (dotimes (_ count)
               (yf-callq code))))
-  (yf-def "WORDS" (yf-print-overlay (yf-words)))
+  (yf-def "WORDS"
+          (message "%s" (yf-words))
+          (yf-print-overlay (yf-words)))
   ;; aliases
   (puthash "|" (gethash "WALL" yf-dict) yf-dict)
   (setq yf-tok-start 0)
@@ -603,7 +605,7 @@
 (defun yf-eval (text &optional offset)
   (interactive)
   (when (zerop (hash-table-count yf-dict))
-    (yf-define-built-ins))
+     (yf-define-built-ins))
   (yf--eval (list (yf-parse text)) offset))
 
 (defun yf--eval (tcell &optional offset disable-progress)
