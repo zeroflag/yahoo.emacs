@@ -602,6 +602,10 @@
               (yf-callq body))))
   (yf-def "CASE" (yf-case))
   (yf-def "CALL" (yf-callq (yf-pop)))
+  (yf-def "ASSERT"
+          (let ((tos (yf-pop)))
+            (unless tos
+              (error "Assertion error: %s" (yf-to-string tos)))))
   (yf-def "TIMES"
           (let ((count (car (yf-pop)))
                 (code (yf-pop)))
