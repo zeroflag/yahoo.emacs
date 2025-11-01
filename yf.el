@@ -343,6 +343,21 @@
 (defun yf-words ()
   (yf-join yf-word-list))
 
+(defun yf-case ()
+  (let* ((split (yf-split-at-wall yf-stack))
+         (quots (reverse (car split)))
+         (rest  (cdr split))
+         (done nil))
+    (setq yf-stack rest)
+    (while (and quots (not done))
+      (let* ((cond (car  quots))
+             (body (cadr quots)))
+        (setq quots (cddr quots))
+        (yf-callq cond)
+        (when (yf-pop)
+          (yf-callq body)
+          (setq done t))))))
+
 (defun yf-num? (str)
   (string-match-p "\\`[+-]?[0-9]+\\(?:\\.[0-9]*\\)?\\'" str))
 
@@ -476,6 +491,7 @@
             (yf-push (and a b))))
   (yf-def "NOT" (yf-push (not (yf-pop))))
   (yf-def "NIL" (yf-push nil))
+  (yf-def "TRUE" (yf-push t))
   (yf-def "SUM" (setq yf-stack (yf-sum-currency-groups yf-stack)))
   (yf-def "SUMPROD"
           (let* ((split (yf-split-at-wall yf-stack))
@@ -584,6 +600,7 @@
             (yf-callq body)
             (while (not (yf-pop))
               (yf-callq body))))
+  (yf-def "CASE" (yf-case))
   (yf-def "CALL" (yf-callq (yf-pop)))
   (yf-def "TIMES"
           (let ((count (car (yf-pop)))

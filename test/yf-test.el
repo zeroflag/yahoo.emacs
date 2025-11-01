@@ -64,16 +64,16 @@
   (should (equal (eval1 "-1 -2 >=") '( t ))))
 
 (ert-deftest yf-logic-test ()
-  (should (equal (eval1 "0 0 =  ( T ) 0 0 =  ( T ) AND") '( t )))
-  (should (equal (eval1 "0 0 <> ( F ) 0 0 =  ( T ) AND") '( nil )))
-  (should (equal (eval1 "0 0 =  ( T ) 0 0 <> ( F ) AND") '( nil )))
-  (should (equal (eval1 "0 0 <> ( F ) 0 0 <> ( F ) AND") '( nil )))
-  (should (equal (eval1 "0 0 =  ( T ) 0 0 =  ( T ) OR") '( t )))
-  (should (equal (eval1 "0 0 <> ( F ) 0 0 =  ( T ) OR") '( t )))
-  (should (equal (eval1 "0 0 =  ( T ) 0 0 <> ( F ) OR") '( t )))
-  (should (equal (eval1 "0 0 <> ( F ) 0 0 <> ( F ) OR") '( nil )))
-  (should (equal (eval1 "0 0 <> ( F ) not") '( t )))
-  (should (equal (eval1 "0 0 =  ( T ) not") '( nil ))))
+  (should (equal (eval1 "TRUE  TRUE  AND") '( t )))
+  (should (equal (eval1 "NIL   TRUE  AND") '( nil )))
+  (should (equal (eval1 "TRUE  NIL   AND") '( nil )))
+  (should (equal (eval1 "NIL   NIL   AND") '( nil )))
+  (should (equal (eval1 "TRUE  TRUE  OR") '( t )))
+  (should (equal (eval1 "NIL   TRUE  OR") '( t )))
+  (should (equal (eval1 "TRUE  NIL   OR") '( t )))
+  (should (equal (eval1 "NIL   NIL   OR") '( nil )))
+  (should (equal (eval1 "NIL  not") '( t )))
+  (should (equal (eval1 "TRUE not") '( nil ))))
 
 (ert-deftest yf-sum-test ()
   (should (equal (eval1 "sum") '()))
@@ -231,6 +231,36 @@
    1000000 MOD
    269696 =
  ] UNTIL") '((25264 . "ANY"))))
+
+(ert-deftest yf-case-test ()
+  (should (equal (eval1
+        "5 |
+        [ DUP 15 MOD 0 = ] [ \"FIZZBUZZ\" ]
+        [ DUP  3 MOD 0 = ] [ \"FIZZ\"     ]
+        [ DUP  5 MOD 0 = ] [ \"BUZZ\"     ]
+        [ TRUE           ] [ DUP *        ]
+        CASE") '("BUZZ" (5 . "ANY"))))
+  (should (equal (eval1
+        "3 |
+        [ DUP 15 MOD 0 = ] [ \"FIZZBUZZ\" ]
+        [ DUP  3 MOD 0 = ] [ \"FIZZ\"     ]
+        [ DUP  5 MOD 0 = ] [ \"BUZZ\"     ]
+        [ TRUE           ] [ DUP *        ]
+        CASE") '("FIZZ" (3 . "ANY"))))
+  (should (equal (eval1
+        "15 |
+        [ DUP 15 MOD 0 = ] [ \"FIZZBUZZ\" ]
+        [ DUP  3 MOD 0 = ] [ \"FIZZ\"     ]
+        [ DUP  5 MOD 0 = ] [ \"BUZZ\"     ]
+        [ TRUE           ] [ DUP *        ]
+        CASE") '("FIZZBUZZ" (15 . "ANY"))))
+  (should (equal (eval1
+        "42 2 |
+        [ DUP 15 MOD 0 = ] [ \"FIZZBUZZ\" ]
+        [ DUP  3 MOD 0 = ] [ \"FIZZ\"     ]
+        [ DUP  5 MOD 0 = ] [ \"BUZZ\"     ]
+        [ TRUE           ] [ DUP *        ]
+        CASE") '((4 . "ANY") (42 . "ANY")))))
 
 (ert-deftest yf-str-test ()
   (should (equal (eval1 "\"Hello World !\"") '("Hello World !"))))
