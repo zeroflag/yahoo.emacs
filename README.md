@@ -141,6 +141,7 @@ SUMPROD .
 | `WHEN`    | `[cond] [then] →`            | Executes `then` quotation if `cond` is true   |
 | `UNLESS`  | `[cond] [then] →`            | Executes `then` if `cond` evaluates false     |
 | `IF`      | `[cond] [then] [else] →`     | Executes `then` if `cond` evaluates true      |
+| `CASE`    | `| [cond] [body] ..   →`     | Evaluate `cond` `body` pairs until `|`        |
 | `WHILE`	  | `[cond] [body] →`            | Executes `body` as long as `cond` is true     | 
 | `UNTIL`   | `[body] [cond] →`            | Repeats `body` until `cond` becomes true      |
 | `TIMES`   | `[quote] n →`                | Executes quotation `n` times                  |
@@ -159,6 +160,20 @@ Examples:
 ( select the minimum )
 2 3 [ OVER OVER < ] [ DROP ] [ SWAP DROP ] IF
 
+```
+
+```forth
+1
+[ DUP 30 <= ]
+[
+  | [ DUP 15 MOD 0 = ] [ "FIZZBUZZ" MESSAGE ]
+    [ DUP  3 MOD 0 = ] [ "FIZZ"     MESSAGE ]
+    [ DUP  5 MOD 0 = ] [ "BUZZ"     MESSAGE ]
+    [ TRUE           ] [  DUP       MESSAGE ] CASE
+  1 +
+] WHILE
+
+DROP
 ```
 
 ### 👷 Defining words
