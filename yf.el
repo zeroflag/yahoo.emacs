@@ -475,6 +475,13 @@
           (let ((b (yf-pop))
                 (a (yf-pop)))
             (yf-push (yf-mod a b))))
+  (yf-def "%CHG"
+          (let* ((b (yf-pop))
+                 (a (yf-pop))
+                 (d (yf-sub b a))
+                 (r (yf-mul '(100 . yf-default-currency)
+                            (yf-div d a))))
+            (yf-push r)))
   (yf-def "<" (yf-push (yf-lt (yf-pop) (yf-pop))))
   (yf-def "<=" (yf-push (yf-lte (yf-pop) (yf-pop))))
   (yf-def ">" (yf-push (yf-gt (yf-pop) (yf-pop))))
