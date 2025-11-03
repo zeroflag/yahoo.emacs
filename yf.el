@@ -342,7 +342,8 @@
 (defun yf-kill-timer (timer)
   (unless (timerp timer)
     (user-error "KILL needs a timer, got %s" timer))
-  (cancel-timer timer))
+  (cancel-timer timer)
+  (delq timer yf-timers))
 
 (defun yf-delete-overlays ()
   "Delete all overlays created by YF."
