@@ -479,7 +479,7 @@
           (let* ((b (yf-pop))
                  (a (yf-pop))
                  (d (yf-sub b a))
-                 (r (yf-mul '(100 . yf-default-currency)
+                 (r (yf-mul (cons 100 yf-default-currency)
                             (yf-div d a))))
             (yf-push r)))
   (yf-def "<" (yf-push (yf-lt (yf-pop) (yf-pop))))
