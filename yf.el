@@ -26,6 +26,7 @@
 (defvar yf-debug nil)
 (defvar yf-show-progress t)
 (defvar yf-overlays '())
+(defvar yf-timers '())
 (defvar yf-overlay-color "green")
 (defvar yf-cache-ttl-sec (* 10 60))
 (defvar yf-number-format "%.2f")
@@ -188,6 +189,8 @@
             " ]"))
    ((eq item 'WALL)
     "|")
+   ((timerp item)
+    (format "<TIMER%s>" item))
    (t
     (format "%s" item))))
 
@@ -325,6 +328,21 @@
                  (concat
                   (propertize " => " 'face `(:foreground "brown"))
                   (propertize text 'face `(:foreground ,yf-overlay-color))))))
+
+(defun yf-start-timer ()
+  (let* ((quot (yf-pop))
+         (interval (yf-pop))
+         (code (lambda () (yf-callq quot))))
+    (unless (yf-money? interval)
+      (user-error "WATCH needs interval, got %s" interval))
+    (unless (listp quot)
+      (user-error "WATCH needs quotation, got %s" quot))
+    (push (run-with-timer 0 (car interval) code) yf-timers)))
+
+(defun yf-kill-timer (timer)
+  (unless (timerp timer)
+    (user-error "KILL needs a timer, got %s" timer))
+  (cancel-timer (yf-pop)))
 
 (defun yf-delete-overlays ()
   "Delete all overlays created by YF."
@@ -609,6 +627,11 @@
               (yf-callq body))))
   (yf-def "CASE" (yf-case))
   (yf-def "CALL" (yf-callq (yf-pop)))
+  (yf-def "WATCH" (yf-start-timer))
+  (yf-def "LAST-TIMER" (yf-push (car yf-timers)))
+  (yf-def "KILL-ALL" (while yf-timers
+                       (yf-kill-timer (car yf-timers))))
+  (yf-def "KILL" (yf-kill-timer (yf-pop)))
   (yf-def "ASSERT"
           (let ((tos (yf-pop)))
             (unless tos
