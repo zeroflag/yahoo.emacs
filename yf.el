@@ -646,6 +646,11 @@
   (yf-def "LAST-TIMER" (yf-push (car yf-timers)))
   (yf-def "KILL-ALL" (yf-kill-all-timers))
   (yf-def "KILL" (yf-kill-timer (yf-pop)))
+  (yf-def "SHELL"
+          (let ((cmd (yf-pop)))
+            (unless (stringp cmd)
+              (user-error "SHELL needs a string, got %s" cmd))
+            (shell-command cmd)))
   (yf-def "ASSERT"
           (let ((tos (yf-pop)))
             (unless tos
