@@ -28,10 +28,17 @@
     (modify-syntax-entry ?\) ">" st)
     st))
 
+(defconst yf-builtin-symbols
+  '("+" "-" "*" "/" "?" "." ".s" "|" ">" ">=" "<" "<="))
+
 (defun yf-mode-builtin-words ()
   (unless yf-word-list
     (yf-eval "")) ; initialize dictionary with a dummy eval
-  yf-word-list)
+  (let ((result nil))
+    (dolist (each yf-word-list)
+      (unless (member each yf-builtin-symbols)
+        (push each result)))
+    result))
 
 (defun yf-mode-completion ()
   (let ((bounds (bounds-of-thing-at-point 'symbol)))
@@ -41,9 +48,6 @@
              (words (yf-mode-builtin-words))
              (all (append words yf-currency-codes)))
         (list start end all)))))
-
-(defconst yf-builtin-symbols
-  '("+" "-" "*" "/" "?" "." ".s" "|"))
 
 (defvar yf-font-lock-defaults
   `((,(regexp-opt yf-currency-codes 'words) . font-lock-keyword-face)
