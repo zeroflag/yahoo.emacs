@@ -35,7 +35,8 @@
       (yf-repl-clear)
     (yf-eval input (- yf-repl-last-prompt-end 1)))
   (let ((output (yf-show-stack)))
-    (comint-output-filter proc (concat output "\n"))
+    (unless (eq "" output)
+      (comint-output-filter proc (concat output "\n")))
     (comint-output-filter proc yf-repl-prompt))
   (setq yf-repl-last-prompt-end (point)))
 

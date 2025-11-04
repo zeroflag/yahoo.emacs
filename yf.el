@@ -321,8 +321,8 @@
 
 (defun yf-find-overlay (start end)
   (seq-find (lambda (each)
-              (and (= (overlay-start each) start)
-                   (= (overlay-end each) end)))
+              (and (eq (overlay-start each) start)
+                   (eq (overlay-end each) end)))
             yf-overlays))
 
 (defun yf-print-overlay (text)
@@ -716,7 +716,9 @@
   yf-stack)
 
 (defun yf-show-stack ()
-  (mapconcat #'yf-to-string (reverse yf-stack) " "))
+  (if yf-stack
+      (mapconcat #'yf-to-string (reverse yf-stack) " ")
+    ""))
 
 (defun yf-clean-state ()
   (yf-delete-overlays)
