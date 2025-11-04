@@ -20,7 +20,7 @@
 
 (defconst yf-repl-name "*YF-REPL*")
 (defconst yf-repl-buffer-name (concat "*" yf-repl-name "*"))
-(defconst yf-repl-prompt "YF % ")
+(defconst yf-repl-prompt "OK % ")
 
 (defvar yf-repl-history-file
   (expand-file-name "yf-repl-history" user-emacs-directory)
