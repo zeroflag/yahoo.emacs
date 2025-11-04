@@ -348,6 +348,10 @@
       (user-error "WATCH needs quotation, got %s" quot))
     (push (run-with-timer 0 (car interval) code) yf-timers)))
 
+(defun yf-kill-all-timers ()
+  (while yf-timers
+    (yf-kill-timer (car yf-timers))))
+
 (defun yf-kill-timer (timer)
   (unless (timerp timer)
     (user-error "KILL needs a timer, got %s" timer))
@@ -640,8 +644,7 @@
   (yf-def "CALL" (yf-callq (yf-pop)))
   (yf-def "WATCH" (yf-start-timer))
   (yf-def "LAST-TIMER" (yf-push (car yf-timers)))
-  (yf-def "KILL-ALL" (while yf-timers
-                       (yf-kill-timer (car yf-timers))))
+  (yf-def "KILL-ALL" (yf-kill-all-timers))
   (yf-def "KILL" (yf-kill-timer (yf-pop)))
   (yf-def "ASSERT"
           (let ((tos (yf-pop)))

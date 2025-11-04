@@ -79,6 +79,7 @@
   (interactive)
   (yf-clear)
   (yf-forget)
+  (yf-kill-all-timers)
   (let ((buf (get-buffer yf-repl-buffer-name)))
     (when buf (kill-buffer buf))
     (yf-repl-start)))
