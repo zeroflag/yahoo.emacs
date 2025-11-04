@@ -559,6 +559,7 @@
   (yf-def "OVER" (yf-push (yf-tos2)))
   (yf-def "DROP" (yf-pop))
   (yf-def "CLEAR" (yf-clear))
+  (yf-def "CLEAN" (yf-delete-overlays))
   (yf-def "DEPTH"
           (yf-push (cons (length yf-stack) yf-default-currency)))
   (yf-def "TALLY"
