@@ -724,6 +724,7 @@
     ""))
 
 (defun yf-clean-state ()
+  (yf-kill-all-timers)
   (yf-delete-overlays)
   (yf-clear)
   (yf-forget))
@@ -731,7 +732,6 @@
 (defun yf-eval-line ()
   "Read and eval current line as YF code."
   (interactive)
-  (yf-clean-state)
   (let* ((line (thing-at-point 'line t))
          (offset (- (line-beginning-position) 1)))
     (yf-eval line offset)
@@ -740,7 +740,6 @@
 (defun yf-eval-region (start end)
   "Read and eval the region between START and END as YF code."
   (interactive "r")
-  (yf-clean-state)
   (let* ((text (buffer-substring-no-properties start end))
          (offset (- start 1)))
     (yf-eval text offset)
