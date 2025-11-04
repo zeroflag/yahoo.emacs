@@ -50,7 +50,8 @@
         (list start end all)))))
 
 (defvar yf-font-lock-defaults
-  `((,(regexp-opt yf-currency-codes 'words) . font-lock-keyword-face)
+  `((,(concat "\\_<" (regexp-opt (mapcar #'upcase   yf-currency-codes)) "\\_>") . font-lock-keyword-face)
+    (,(concat "\\_<" (regexp-opt (mapcar #'downcase yf-currency-codes)) "\\_>") . font-lock-keyword-face)
     (,(concat "\\<" yf-ticker-regexp "\\>") . font-lock-type-face)
     ("\\<-?[0-9]+\\(\\.[0-9]+\\)?\\>" . font-lock-constant-face)
     (,(regexp-opt
