@@ -319,10 +319,19 @@
 (defun yf-callq (quotation)
   (setq yf-stack (yf--eval (list (reverse quotation)) nil t)))
 
+(defun yf-find-overlay (start end)
+  (seq-find (lambda (each)
+              (and (= (overlay-start each) start)
+                   (= (overlay-end each) end)))
+            yf-overlays))
+
 (defun yf-print-overlay (text)
-  (let ((overlay (make-overlay (1+ yf-tok-start)
-                               (1+ yf-tok-end))))
-    (push overlay yf-overlays)
+  (let* ((start (1+ yf-tok-start))
+         (end (1+ yf-tok-end))
+         (overlay (yf-find-overlay start end)))
+    (unless overlay
+      (setq overlay (make-overlay start end))
+      (push overlay yf-overlays))
     (overlay-put overlay
                  'after-string
                  (concat
