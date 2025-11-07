@@ -27,7 +27,7 @@
 (defvar yf-show-progress t)
 (defvar yf-overlays '())
 (defvar yf-timers '())
-(defvar yf-overlay-color "green")
+(defvar yf-overlay-color font-lock-comment-face)
 (defvar yf-cache-ttl-sec (* 10 60))
 (defvar yf-number-format "%.2f")
 (defvar yf-small-currency-threshold 0.01)
@@ -335,8 +335,8 @@
     (overlay-put overlay
                  'after-string
                  (concat
-                  (propertize " => " 'face `(:foreground "brown"))
-                  (propertize text 'face `(:foreground ,yf-overlay-color))))))
+                  (propertize " => " 'face `(:foreground "brown" :slant italic))
+                  (propertize text 'face `(:foreground ,yf-overlay-color :slant italic))))))
 
 (defun yf-start-timer ()
   (let* ((quot (yf-pop))
