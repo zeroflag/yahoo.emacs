@@ -335,7 +335,7 @@
     (overlay-put overlay
                  'after-string
                  (concat
-                  (propertize " => " 'face `(:foreground "brown" :slant italic))
+                  (propertize " => " 'face `(:foreground "brown" :slant italic :compose t))
                   (propertize text 'face `(:foreground ,yf-overlay-color :slant italic))))))
 
 (defun yf-start-timer ()
