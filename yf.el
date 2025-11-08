@@ -334,7 +334,7 @@
     (overlay-put overlay
                  'after-string
                  (concat
-                  (propertize " => " 'face `(:foreground "brown" :slant italic :compose t))
+                  (propertize " => " 'face `(:inherit font-lock-comment-delimiter-face :slant italic))
                   (propertize text 'face `(:inherit font-lock-comment-face :slant italic))))))
 
 (defun yf-start-timer ()
