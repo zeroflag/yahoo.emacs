@@ -82,11 +82,8 @@
       ,@body)
     yf-dict))
 
-(defmacro yf-defp (name &rest body)
-  `(puthash (upcase ,name)
-    (lambda (_tcell)
-      ,@body)
-    yf-dict))
+(defun yf-def-lambda (name lam)
+  (puthash (upcase name) lam yf-dict))
 
 (defmacro yf-debug-message (fmt &rest args)
   `(when yf-debug
@@ -583,26 +580,30 @@
           (let ((currency (yf-pop))
                 (amount (yf-pop)))
             (yf-push (yf-to amount currency))))
-  (yf-defp "TO"
-           (let ((currency (yf-tok _tcell)))
-             (yf-push (yf-to (yf-pop) currency)))
-           (yf-next _tcell))
-  (yf-defp "SET"
-           (let ((name (yf-tok _tcell))
-                 (val (yf-pop)))
-             (yf-def name (yf-push val))
-             (yf-refresh-word-list))
-           (yf-next _tcell))
-  (yf-defp "FORGE"
-           (let ((name (yf-tok _tcell))
-                 (body (yf-pop)))
-             (yf-def name (yf-callq body)))
-           (yf-next _tcell))
-  (yf-defp "("
-           (while (and (car _tcell)
-                       (not (string= ")" (yf-tok _tcell))))
-             (yf-next _tcell))
-           (yf-next _tcell))
+  (yf-def-lambda "TO"
+                 (lambda (tcell)
+                   (let ((currency (yf-tok tcell)))
+                     (yf-push (yf-to (yf-pop) currency)))
+                   (yf-next tcell)))
+  (yf-def-lambda "SET"
+                 (lambda (tcell)
+                   (let ((name (yf-tok tcell))
+                         (val (yf-pop)))
+                     (yf-def name (yf-push val))
+                     (yf-refresh-word-list))
+                   (yf-next tcell)))
+  (yf-def-lambda "FORGE"
+                 (lambda (tcell)
+                   (let ((name (yf-tok tcell))
+                         (body (yf-pop)))
+                     (yf-def name (yf-callq body)))
+                   (yf-next tcell)))
+  (yf-def-lambda "("
+                 (lambda (tcell)
+                   (while (and (car tcell)
+                               (not (string= ")" (yf-tok tcell))))
+                     (yf-next tcell))
+                   (yf-next tcell)))
   (yf-def "["
           (setq yf-mode 'quotation)
           (setq yf-quotation-cnt 1)
