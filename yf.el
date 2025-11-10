@@ -430,7 +430,7 @@
         (setq pos end)))
     (nreverse tokens)))
 
-(defun yf-tok (tcell)
+(defun yf-tok-peek (tcell)
   (let* ((tokens (car tcell))
          (tok (caar tokens)))
     (if (yf-str? tok)
@@ -582,28 +582,23 @@
             (yf-push (yf-to amount currency))))
   (yf-def-lambda "TO"
                  (lambda (tcell)
-                   (let ((currency (yf-tok tcell)))
-                     (yf-push (yf-to (yf-pop) currency)))
-                   (yf-next tcell)))
+                   (let ((currency (yf-next tcell)))
+                     (yf-push (yf-to (yf-pop) currency)))))
   (yf-def-lambda "SET"
                  (lambda (tcell)
-                   (let ((name (yf-tok tcell))
+                   (let ((name (yf-next tcell))
                          (val (yf-pop)))
                      (yf-def name (yf-push val))
-                     (yf-refresh-word-list))
-                   (yf-next tcell)))
+                     (yf-refresh-word-list))))
   (yf-def-lambda "FORGE"
                  (lambda (tcell)
-                   (let ((name (yf-tok tcell))
+                   (let ((name (yf-next tcell))
                          (body (yf-pop)))
-                     (yf-def name (yf-callq body)))
-                   (yf-next tcell)))
+                     (yf-def name (yf-callq body)))))
   (yf-def-lambda "("
                  (lambda (tcell)
                    (while (and (car tcell)
-                               (not (string= ")" (yf-tok tcell))))
-                     (yf-next tcell))
-                   (yf-next tcell)))
+                               (not (string= ")" (yf-next tcell)))))))
   (yf-def "["
           (setq yf-mode 'quotation)
           (setq yf-quotation-cnt 1)
@@ -670,8 +665,10 @@
   (setq yf-tok-end 0))
 
 (defun yf-next (tcell)
-  (let ((tokens (car tcell)))
-    (setcar tcell (cdr tokens))))
+  (let ((result (yf-tok-peek tcell))
+        (tokens (car tcell)))
+    (setcar tcell (cdr tokens))
+    result))
 
 (defun yf-eval (text &optional offset)
   (interactive)
@@ -691,7 +688,7 @@
     (unless yf-word-list
       (yf-refresh-word-list))
     (while (car tcell)
-      (setq tok (yf-tok tcell))
+      (setq tok (yf-tok-peek tcell))
       (setq yf-tok-start (+ tok-offset (yf-tok-start tcell)))
       (setq yf-tok-end (+ tok-offset (yf-tok-end tcell)))
       (yf-next tcell)
